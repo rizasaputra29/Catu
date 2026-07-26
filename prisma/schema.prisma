@@ -1,0 +1,79 @@
+// path: prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model User {
+  id             String                 @id @default(cuid())
+  email          String                 @unique
+  password       String
+  fullName       String
+  businessName   String?
+  avatarUrl      String?
+  securityAnswer String
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  transactions          Transaction[]
+  wallets               Wallet[]
+  monthlyOpeningBalance MonthlyOpeningBalance[]
+}
+
+model MonthlyOpeningBalance {
+  id               String   @id @default(cuid())
+  userId           String
+  year             Int
+  month            Int
+  amount           Float    @default(0)
+  isManualOverride Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, year, month])
+  @@index([userId])
+}
+
+model Wallet {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String
+  type         String        @default("cash")
+  balance      Float         @default(0)
+  color        String        @default("#D2F65E")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id            String       @id @default(cuid())
+  userId        String
+  type          String    
+  amount        Float
+  category      String
+  description   String?
+  date          DateTime 
+  createdAt     DateTime     @default(now())
+  
+  // Relations
+  walletId      String?      
+  wallet        Wallet?      @relation(fields: [walletId], references: [id])
+
+  user          User         @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([walletId])
+}
+
