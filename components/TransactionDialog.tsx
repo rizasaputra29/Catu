@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { formatRupiah, cleanRupiah } from '@/lib/utils';
-import { Wallet, Transaction } from '@/contexts/FinanceContext';
+import type { Wallet, Transaction } from '@/lib/types';
 import { ArrowUpRight, ArrowDownRight, Calendar, Tag, Wallet as WalletIcon } from 'lucide-react';
 
 interface TransactionDialogProps {
@@ -77,27 +77,27 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-3xl sm:max-w-md p-0 overflow-hidden bg-white gap-0">
-        <DialogHeader className="p-6 pb-4 border-b border-gray-100">
-          <DialogTitle className="text-2xl font-black">
+      <DialogContent className="border border-border rounded-2xl sm:max-w-md p-0 overflow-hidden bg-white gap-0 shadow-lg">
+         <DialogHeader className="p-6 pb-4 border-b border-border">
+          <DialogTitle className="text-2xl font-bold">
             {initialData ? 'Edit Transaction' : 'New Transaction'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="p-6 space-y-6">
           <Tabs value={type} onValueChange={(v) => setType(v as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 h-12 bg-gray-100 rounded-xl p-1 border-2 border-transparent">
-               <TabsTrigger 
-                    value="expense" 
+            <TabsList className="grid w-full grid-cols-2 h-12 bg-muted rounded-xl p-1">
+               <TabsTrigger
+                    value="expense"
                     disabled={!!initialData}
-                    className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-red-600 data-[state=active]:border-2 data-[state=active]:border-red-100 data-[state=active]:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-lg font-semibold data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all duration-base ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                >
                   <ArrowDownRight className="w-4 h-4 mr-2" /> Expense
                </TabsTrigger>
-               <TabsTrigger 
-                    value="income" 
+               <TabsTrigger
+                    value="income"
                     disabled={!!initialData}
-                    className="rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-green-600 data-[state=active]:border-2 data-[state=active]:border-green-100 data-[state=active]:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-lg font-semibold data-[state=active]:bg-emerald-500 data-[state=active]:text-white transition-all duration-base ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                >
                   <ArrowUpRight className="w-4 h-4 mr-2" /> Income
                </TabsTrigger>
@@ -106,14 +106,14 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
 
            {/* Amount Input */}
            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">Amount</Label>
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Amount</Label>
               <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-black text-gray-400">Rp</span>
-                  <Input 
-                    placeholder="0" 
-                    value={formatRupiah(parseFloat(amount || '0')).replace('Rp', '').trim()} 
-                    onChange={(e) => setAmount(cleanRupiah(e.target.value))} 
-                    className="h-16 pl-12 text-2xl font-black border-2 border-black rounded-2xl focus-visible:ring-4 focus-visible:ring-black/5 transition-all"
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-muted-foreground">Rp</span>
+                  <Input
+                    placeholder="0"
+                    value={formatRupiah(parseFloat(amount || '0')).replace('Rp', '').trim()}
+                    onChange={(e) => setAmount(cleanRupiah(e.target.value))}
+                    className="h-16 pl-12 text-2xl font-bold rounded-2xl"
                   />
               </div>
            </div>
@@ -121,38 +121,38 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
            {/* Details Grid */}
            <div className="grid grid-cols-2 gap-4">
                <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">Wallet</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Wallet</Label>
                   <Select value={walletId} onValueChange={setWalletId}>
-                      <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl font-bold focus:border-black transition-colors bg-gray-50/30">
+                      <SelectTrigger className="h-12 rounded-xl font-bold transition-all duration-base ease-in-out">
                          <div className="flex items-center gap-2 overflow-hidden">
-                             <WalletIcon className="w-4 h-4 text-gray-400 shrink-0" />
+                             <WalletIcon className="w-4 h-4 text-muted-foreground shrink-0" />
                              <span className="truncate">{wallets.find(w => w.id === walletId)?.name || "Select"}</span>
                          </div>
                       </SelectTrigger>
                       <SelectContent>
                           {wallets.map(w => (
                             <SelectItem key={w.id} value={w.id} className="font-medium">
-                                {w.name} <span className="text-xs text-gray-400 ml-1">({formatRupiah(w.balance)})</span>
+                                {w.name} <span className="text-xs text-muted-foreground ml-1">({formatRupiah(w.balance)})</span>
                             </SelectItem>
                           ))}
                       </SelectContent>
                   </Select>
                </div>
                <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">Date</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Date</Label>
                   <div className="relative">
-                      <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-12 border-2 border-gray-200 rounded-xl font-bold pl-10 focus:border-black bg-gray-50/30" />
-                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-12 rounded-xl font-bold pl-10" />
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   </div>
                </div>
            </div>
 
            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</Label>
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Category</Label>
               <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl font-bold focus:border-black transition-colors bg-gray-50/30">
+                  <SelectTrigger className="h-12 rounded-xl font-bold transition-all duration-base ease-in-out">
                       <div className="flex items-center gap-2">
-                         <Tag className="w-4 h-4 text-gray-400" />
+                         <Tag className="w-4 h-4 text-muted-foreground" />
                          <SelectValue placeholder="Select Category" />
                       </div>
                   </SelectTrigger>
@@ -163,21 +163,21 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
                   </SelectContent>
               </Select>
            </div>
-           
+
            <div className="space-y-2">
-               <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">Note (Optional)</Label>
-               <Textarea 
-                  placeholder="Add details..." 
-                  value={desc} 
-                  onChange={(e) => setDesc(e.target.value)} 
-                  className="border-2 border-gray-200 rounded-xl resize-none font-medium focus:border-black bg-gray-50/30 min-h-[80px]" 
+               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Note (Optional)</Label>
+               <Textarea
+                  placeholder="Add details..."
+                  value={desc}
+                  onChange={(e) => setDesc(e.target.value)}
+                  className="rounded-xl resize-none font-medium min-h-[80px]"
                />
            </div>
 
-           <Button 
-             onClick={handleSave} 
+           <Button
+             onClick={handleSave}
              disabled={!amount || !walletId || !category || isSubmitting}
-             className="w-full h-14 rounded-2xl bg-black text-white font-bold text-lg hover:bg-gray-900 shadow-lg hover:translate-y-[-2px] transition-all disabled:opacity-50 disabled:hover:translate-y-0 active:scale-95"
+             className="w-full h-14 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary/90 transition-all duration-base ease-in-out disabled:opacity-50"
            >
              {isSubmitting ? 'Saving...' : (initialData ? 'Update Transaction' : 'Save Transaction')}
            </Button>
