@@ -1,8 +1,15 @@
 'use client';
 
-import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useState, useMemo, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useFinance, Transaction } from '@/contexts/FinanceContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTransactions } from '@/hooks/queries/useTransactions';
+import { useWallets } from '@/hooks/queries/useWallets';
+import {
+  useCreateTransaction,
+  useUpdateTransaction,
+  useDeleteTransaction,
+} from '@/hooks/mutations/useTransactionMutations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,79 +17,239 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { LedgerView } from '@/components/LedgerView';
+import { TransactionDialog } from '@/components/TransactionDialog';
+import { DataTable } from '@/components/ui/data-table';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { DataTableViewOptions } from '@/components/ui/data-table-view-options';
+import { getTransactionColumns } from '@/components/transactions/columns';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  SortingState,
+  PaginationState,
+  VisibilityState,
+} from '@tanstack/react-table';
 import {
   Plus,
-  Trash2,
-  TrendingUp,
-  TrendingDown,
-  Edit,
   X,
-  Calendar as CalendarIcon,
-  Filter,
-  Search,
-  Wallet,
   List,
-  BookOpen
+  BookOpen,
+  Search,
+  Filter,
+  Calendar as CalendarIcon,
+  Loader2,
 } from 'lucide-react';
 import { formatRupiah } from '@/lib/utils';
-import { TransactionDialog } from '@/components/TransactionDialog';
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
-
-const ITEMS_PER_PAGE = 10;
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import type { Transaction, TransactionFilters, TableSort } from '@/lib/types';
 
 type TabValue = 'transactions' | 'cash-book';
 
+const VALID_SORT_COLUMNS = ['date', 'amount', 'category', 'type', 'description', 'wallet', 'createdAt'];
+
+function parseTableState(searchParams: URLSearchParams) {
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+  const pageSize = Math.max(1, Math.min(100, parseInt(searchParams.get('pageSize') || '10', 10)));
+  const rawSortColumn = searchParams.get('sortColumn') || 'date';
+  const sortColumn = VALID_SORT_COLUMNS.includes(rawSortColumn) ? rawSortColumn : 'date';
+  const sortDirection = searchParams.get('sortDirection') === 'asc' ? 'asc' : 'desc';
+  const type = (searchParams.get('type') as TransactionFilters['type']) || 'all';
+  const category = searchParams.get('category') || undefined;
+  const walletId = searchParams.get('walletId') || undefined;
+  const startDate = searchParams.get('startDate') || undefined;
+  const endDate = searchParams.get('endDate') || undefined;
+  const search = searchParams.get('search') || undefined;
+  const hide = searchParams.get('hide') || '';
+
+  const columnVisibility: VisibilityState = {};
+  hide.split(',').forEach((id) => {
+    if (id) columnVisibility[id] = false;
+  });
+
+  return {
+    page,
+    pageSize,
+    sort: { column: sortColumn, direction: sortDirection } as TableSort,
+    filters: { type, category, walletId, startDate, endDate, search } as TransactionFilters,
+    columnVisibility,
+  };
+}
+
+function buildSearchParams(
+  pagination: PaginationState,
+  sorting: SortingState,
+  filters: TransactionFilters,
+  columnVisibility: VisibilityState,
+  baseParams: URLSearchParams
+): URLSearchParams {
+  const params = new URLSearchParams(baseParams);
+  params.set('page', String(pagination.pageIndex + 1));
+  params.set('pageSize', String(pagination.pageSize));
+
+  if (sorting[0]) {
+    params.set('sortColumn', sorting[0].id);
+    params.set('sortDirection', sorting[0].desc ? 'desc' : 'asc');
+  } else {
+    params.delete('sortColumn');
+    params.delete('sortDirection');
+  }
+
+  if (filters.type && filters.type !== 'all') params.set('type', filters.type);
+  else params.delete('type');
+  if (filters.category) params.set('category', filters.category);
+  else params.delete('category');
+  if (filters.walletId) params.set('walletId', filters.walletId);
+  else params.delete('walletId');
+  if (filters.startDate) params.set('startDate', filters.startDate);
+  else params.delete('startDate');
+  if (filters.endDate) params.set('endDate', filters.endDate);
+  else params.delete('endDate');
+  if (filters.search) params.set('search', filters.search);
+  else params.delete('search');
+
+  const hiddenColumns = Object.entries(columnVisibility)
+    .filter(([, visible]) => !visible)
+    .map(([id]) => id);
+  if (hiddenColumns.length) params.set('hide', hiddenColumns.join(','));
+  else params.delete('hide');
+
+  return params;
+}
+
 function TransactionsList() {
-  const { transactions, addTransaction, updateTransaction, deleteTransaction, wallets } = useFinance();
+  const { user } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const initialState = useMemo(() => parseTableState(searchParams), [searchParams]);
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: initialState.page - 1,
+    pageSize: initialState.pageSize,
+  });
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: initialState.sort.column, desc: initialState.sort.direction === 'desc' },
+  ]);
+  const [filters, setFilters] = useState<TransactionFilters>(initialState.filters);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialState.columnVisibility);
+  const [searchInput, setSearchInput] = useState(initialState.filters.search || '');
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTxn, setEditingTxn] = useState<Transaction | null>(null);
+  const [deletingTxn, setDeletingTxn] = useState<Transaction | null>(null);
 
-  const [dateFilter, setDateFilter] = useState({
-    startDate: '',
-    endDate: ''
+  const { data, isLoading } = useTransactions({
+    page: pagination.pageIndex + 1,
+    pageSize: pagination.pageSize,
+    sort: sorting[0]
+      ? { column: sorting[0].id, direction: sorting[0].desc ? 'desc' : 'asc' }
+      : { column: 'date', direction: 'desc' },
+    filters,
+    enabled: Boolean(user),
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const { data: wallets } = useWallets({ enabled: Boolean(user) });
+  const createTransaction = useCreateTransaction();
+  const updateTransaction = useUpdateTransaction();
+  const deleteTransaction = useDeleteTransaction();
 
+  // Sync URL state when table state changes.
   useEffect(() => {
-    setCurrentPage(1);
-  }, [dateFilter]);
+    const params = buildSearchParams(pagination, sorting, filters, columnVisibility, searchParams);
+    const newQuery = params.toString();
+    const currentQuery = searchParams.toString();
+    if (newQuery !== currentQuery) {
+      router.push(`/transactions?${newQuery}`, { scroll: false });
+    }
+  }, [pagination, sorting, filters, columnVisibility]);
 
-  const filteredTransactions = useMemo(() => {
-    return transactions
-      .filter(t => {
-        if (dateFilter.startDate && t.date < dateFilter.startDate) return false;
-        if (dateFilter.endDate && t.date > dateFilter.endDate) return false;
-        return true;
-      })
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [transactions, dateFilter]);
+  // Debounce search input into filters.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFilters((prev) => (prev.search === searchInput ? prev : { ...prev, search: searchInput || undefined }));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const tableData = useMemo(() => data?.data ?? [], [data]);
+  const pageCount = useMemo(() => data?.meta.totalPages ?? 0, [data]);
+  const totalItems = useMemo(() => data?.meta.totalItems ?? 0, [data]);
+
+  const columns = useMemo(
+    () =>
+      getTransactionColumns({
+        onEdit: (txn) => {
+          setEditingTxn(txn);
+          setIsDialogOpen(true);
+        },
+        onDelete: (txn) => setDeletingTxn(txn),
+        isDeleting: deleteTransaction.isPending ? deletingTxn?.id : null,
+      }),
+    [deleteTransaction.isPending, deletingTxn?.id]
+  );
+
+  const table = useReactTable({
+    data: tableData,
+    columns,
+    pageCount,
+    state: {
+      pagination,
+      sorting,
+      columnVisibility,
+    },
+    manualPagination: true,
+    manualSorting: true,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  const hasFilters =
+    filters.type !== 'all' ||
+    filters.category ||
+    filters.walletId ||
+    filters.startDate ||
+    filters.endDate ||
+    filters.search;
 
   const clearFilters = () => {
-    setDateFilter({ startDate: '', endDate: '' });
+    setFilters({ type: 'all' });
+    setSearchInput('');
   };
 
-  const handleSaveTransaction = async (data: any) => {
-    if (!editingTxn && data.type === 'expense') {
-      const selectedWallet = wallets.find(w => w.id === data.walletId);
-      if (selectedWallet && selectedWallet.balance < data.amount) {
+  const handleSaveTransaction = async (formData: any) => {
+    if (!formData.type || !formData.category || !formData.walletId) {
+      toast({ title: 'Error', description: 'Please fill all required fields', variant: 'destructive' });
+      return;
+    }
+
+    if (!editingTxn && formData.type === 'expense') {
+      const selectedWallet = wallets?.find((w) => w.id === formData.walletId);
+      if (selectedWallet && selectedWallet.balance < formData.amount) {
         toast({
           title: 'Insufficient Balance',
           description: `Your ${selectedWallet.name} only has ${formatRupiah(selectedWallet.balance)}.`,
-          variant: 'destructive'
+          variant: 'destructive',
         });
         return;
       }
@@ -90,213 +257,226 @@ function TransactionsList() {
 
     try {
       if (editingTxn) {
-        await updateTransaction(data.id, data);
+        await updateTransaction.mutateAsync({ ...formData, id: editingTxn.id });
         toast({ title: 'Success', description: 'Transaction updated successfully' });
       } else {
-        await addTransaction(data);
+        await createTransaction.mutateAsync(formData);
         toast({ title: 'Success', description: 'Transaction added successfully' });
       }
       setIsDialogOpen(false);
       setEditingTxn(null);
     } catch (e) {
-      toast({ title: 'Error', description: 'Failed to save.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Failed to save transaction.', variant: 'destructive' });
     }
   };
 
-  const openAddDialog = () => {
-    setEditingTxn(null);
-    setIsDialogOpen(true);
-  };
-
-  const openEditDialog = (e: React.MouseEvent, txn: Transaction) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setEditingTxn(txn);
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteTransaction = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handleConfirmDelete = async () => {
+    if (!deletingTxn) return;
     try {
-      await deleteTransaction(id);
+      await deleteTransaction.mutateAsync(deletingTxn.id);
       toast({ title: 'Success', description: 'Transaction deleted' });
     } catch (e) {
-      toast({ title: 'Error', description: 'Failed to delete.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Failed to delete transaction.', variant: 'destructive' });
+    } finally {
+      setDeletingTxn(null);
     }
   };
+
+  const incomeCategories = ['Sales', 'Service', 'Other Income'];
+  const expenseCategories = ['Inventory', 'Rent', 'Utilities', 'Salaries', 'Transportation', 'Marketing', 'Equipment', 'Maintenance', 'Other Expense'];
 
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <h2 className="text-2xl md:text-3xl font-black tracking-tight flex items-center gap-3">
-          <List className="w-7 h-7" /> Transactions
+        <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-3">
+          <List className="w-6 h-6 text-muted-foreground" /> Transactions
         </h2>
         <Button
-          onClick={openAddDialog}
-          className="h-12 px-6 rounded-full bg-black text-white font-bold hover:scale-105 transition-transform shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]"
+          onClick={() => {
+            setEditingTxn(null);
+            setIsDialogOpen(true);
+          }}
+          className="h-10 px-5 rounded-full bg-primary text-primary-foreground font-medium shadow-sm hover:shadow transition-all duration-base"
         >
-          <Plus className="w-5 h-5 mr-2" /> Add New
+          <Plus className="w-4 h-4 mr-2" /> Add New
         </Button>
       </div>
 
-      {/* Filter Section */}
-      <div className="mb-8 bg-[#D2F65E] border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-[2rem] p-6 md:p-8 relative overflow-hidden">
-        <div className="flex flex-col md:flex-row items-end gap-6 relative z-10">
-          <div className="flex items-center gap-3 w-full md:w-auto mb-2 md:mb-0">
-            <div className="bg-black p-2 rounded-xl">
-              <Filter className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-black text-2xl tracking-tight text-black">Filter</span>
-          </div>
-          <div className="grid grid-cols-2 gap-4 flex-1 w-7/8">
-            <div className="space-y-2">
-              <Label htmlFor="startDate" className="text-xs font-black text-black/60 uppercase tracking-wider">From Date</Label>
-              <Input
-                id="startDate"
-                type="date"
-                value={dateFilter.startDate}
-                onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value })}
-                className="h-12 border-2 border-black rounded-xl font-bold bg-white focus:ring-black/10"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate" className="text-xs font-black text-black/60 uppercase tracking-wider">To Date</Label>
-              <Input
-                id="endDate"
-                type="date"
-                value={dateFilter.endDate}
-                onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value })}
-                className="h-12 border-2 border-black rounded-xl font-bold bg-white focus:ring-black/10"
-              />
-            </div>
-          </div>
-          {(dateFilter.startDate || dateFilter.endDate) && (
-            <Button
-              onClick={clearFilters}
-              className="h-12 px-6 rounded-xl bg-white border-2 border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 font-black uppercase tracking-wide shadow-sm"
-            >
-              <X className="w-5 h-5 mr-2" /> Clear
-            </Button>
-          )}
-        </div>
-
-        <div className="absolute -right-6 -bottom-10 opacity-10">
-          <Filter className="w-40 h-40" />
-        </div>
-      </div>
-
-      {/* Transaction List */}
-      <div className="space-y-4">
-        {paginatedTransactions.length === 0 ? (
-          <div className="bg-white border-2 border-dashed border-gray-300 rounded-[2rem] p-12 text-center">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-bold mb-1">No transactions found</h3>
-            <p className="text-gray-500 text-sm">Try adjusting your filters or add a new one.</p>
-          </div>
-        ) : (
-          <>
-            {paginatedTransactions.map((transaction) => {
-              const walletName = wallets.find(w => w.id === transaction.walletId)?.name || 'Unknown Wallet';
-
-              return (
-                <div key={transaction.id} className="block group">
-                  <Card className="border-2 border-black shadow-sm hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-300 rounded-[1.5rem] overflow-hidden">
-                    <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 border-black shrink-0 ${transaction.type === 'income' ? 'bg-[#D2F65E]' : 'bg-white'}`}>
-                          {transaction.type === 'income' ? <TrendingUp className="w-6 h-6 text-black" /> : <TrendingDown className="w-6 h-6 text-black" />}
-                        </div>
-                        <div>
-                          <p className="font-black text-lg">{transaction.category}</p>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-gray-500 font-medium">
-                            <span className="flex items-center gap-2">
-                              <CalendarIcon className="w-3 h-3" />
-                              {new Date(transaction.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                            </span>
-                            <span className="hidden sm:inline text-gray-300">•</span>
-                            <span className="flex items-center gap-1.5 text-gray-600">
-                              <Wallet className="w-3.5 h-3.5" />
-                              {walletName}
-                            </span>
-                          </div>
-                          {transaction.description && (
-                            <p className="text-xs text-gray-400 mt-1 line-clamp-1">{transaction.description}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-0 border-gray-100 pt-4 sm:pt-0">
-                        <span className={`text-xl font-black ${transaction.type === 'income' ? 'text-green-600' : 'text-black'}`}>
-                          {transaction.type === 'income' ? '+' : '-'} {formatRupiah(transaction.amount).replace('Rp', 'Rp ')}
-                        </span>
-
-                        <div className="flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-9 w-9 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-black hover:bg-black hover:text-white transition-colors"
-                            onClick={(e) => openEditDialog(e, transaction)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-9 w-9 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors"
-                            onClick={(e) => handleDeleteTransaction(e, transaction.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            })}
-
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="pt-6">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      />
-                    </PaginationItem>
-
-                    <PaginationItem>
-                      <span className="text-sm font-bold mx-2">
-                        Page {currentPage} of {totalPages}
-                      </span>
-                    </PaginationItem>
-
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+      {/* Filters */}
+      <Card className="mb-6 shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 p-2 rounded-lg">
+                <Filter className="w-5 h-5 text-primary" />
               </div>
+              <span className="font-semibold text-lg text-foreground">Filters</span>
+              {hasFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="ml-auto h-8 rounded-full">
+                  <X className="w-4 h-4 mr-2" /> Clear
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Search</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Description or category"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="h-10 pl-9 rounded-lg bg-background"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Type</Label>
+                <Select
+                  value={filters.type || 'all'}
+                  onValueChange={(value) => setFilters((prev) => ({ ...prev, type: value as TransactionFilters['type'] }))}
+                >
+                  <SelectTrigger className="h-10 rounded-lg bg-background">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="income">Income</SelectItem>
+                    <SelectItem value="expense">Expense</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Wallet</Label>
+                <Select
+                  value={filters.walletId || 'all'}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({ ...prev, walletId: value === 'all' ? undefined : value }))
+                  }
+                >
+                  <SelectTrigger className="h-10 rounded-lg bg-background">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Wallets</SelectItem>
+                    {wallets?.map((w) => (
+                      <SelectItem key={w.id} value={w.id}>
+                        {w.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Category</Label>
+                <Select
+                  value={filters.category || 'all'}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({ ...prev, category: value === 'all' ? undefined : value }))
+                  }
+                >
+                  <SelectTrigger className="h-10 rounded-lg bg-background">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {[...incomeCategories, ...expenseCategories].map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">From Date</Label>
+                <div className="relative">
+                  <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="date"
+                    value={filters.startDate || ''}
+                    onChange={(e) => setFilters((prev) => ({ ...prev, startDate: e.target.value || undefined }))}
+                    className="h-10 pl-9 rounded-lg bg-background"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">To Date</Label>
+                <div className="relative">
+                  <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="date"
+                    value={filters.endDate || ''}
+                    onChange={(e) => setFilters((prev) => ({ ...prev, endDate: e.target.value || undefined }))}
+                    className="h-10 pl-9 rounded-lg bg-background"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Table */}
+      <Card className="border-border rounded-xl overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="text-sm text-muted-foreground">
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading...
+              </span>
+            ) : (
+              <>
+                Showing <strong>{totalItems > 0 ? pagination.pageIndex * pagination.pageSize + 1 : 0}</strong> -{' '}
+                <strong>{Math.min((pagination.pageIndex + 1) * pagination.pageSize, totalItems)}</strong> of{' '}
+                <strong>{totalItems}</strong> transactions
+              </>
             )}
-          </>
-        )}
-      </div>
+          </div>
+          <DataTableViewOptions table={table} />
+        </div>
+        <DataTable table={table} loading={isLoading} emptyMessage="No transactions found. Try adjusting your filters or add a new one." />
+        <div className="p-4 border-t border-border">
+          <DataTablePagination table={table} totalItems={totalItems} />
+        </div>
+      </Card>
 
       <TransactionDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onSave={handleSaveTransaction}
-        wallets={wallets}
+        wallets={wallets ?? []}
         initialData={editingTxn}
       />
+
+      <AlertDialog open={Boolean(deletingTxn)} onOpenChange={(open) => !open && setDeletingTxn(null)}>
+        <AlertDialogContent className="rounded-2xl border border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-semibold">Delete Transaction?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This transaction will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setDeletingTxn(null)}
+              className="rounded-full border border-border font-medium"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={deleteTransaction.isPending}
+              className="rounded-full bg-destructive text-white hover:bg-destructive/90 font-medium"
+            >
+              {deleteTransaction.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : null}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -314,16 +494,24 @@ function TransactionsPageTabs() {
   const handleTabChange = (value: string) => {
     const tab = value as TabValue;
     setActiveTab(tab);
-    router.push(`/transactions?tab=${tab}`, { scroll: false });
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tab);
+    router.push(`/transactions?${params.toString()}`, { scroll: false });
   };
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-      <TabsList className="grid w-full max-w-md grid-cols-2 h-12 bg-white border-2 border-black rounded-xl p-1 mb-8">
-        <TabsTrigger value="transactions" className="rounded-lg font-bold data-[state=active]:bg-black data-[state=active]:text-[#D2F65E] transition-all">
+      <TabsList className="grid w-full max-w-md grid-cols-2 h-11 bg-muted rounded-full p-1 mb-8">
+        <TabsTrigger
+          value="transactions"
+          className="rounded-full font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all duration-base"
+        >
           <List className="w-4 h-4 mr-2" /> Transactions
         </TabsTrigger>
-        <TabsTrigger value="cash-book" className="rounded-lg font-bold data-[state=active]:bg-black data-[state=active]:text-[#D2F65E] transition-all">
+        <TabsTrigger
+          value="cash-book"
+          className="rounded-full font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all duration-base"
+        >
           <BookOpen className="w-4 h-4 mr-2" /> Cash Book
         </TabsTrigger>
       </TabsList>
@@ -341,12 +529,11 @@ function TransactionsPageTabs() {
 
 export default function TransactionsPage() {
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-8 font-sans selection:bg-[#D2F65E]">
+    <div className="min-h-screen bg-background pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight">Transactions</h1>
-          <p className="text-sm text-gray-500 font-medium mt-1">Manage your income, expenses, and monthly cash book</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Transactions</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage your income, expenses, and monthly cash book</p>
         </div>
 
         <Suspense fallback={null}>
