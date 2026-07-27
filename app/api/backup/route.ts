@@ -47,7 +47,7 @@ export async function GET(request: Request) {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Content-Disposition': `attachment; filename="cashmap_backup_${userId}.json"`,
+        'Content-Disposition': `attachment; filename="catu_backup_${userId}.json"`,
       },
     });
 
