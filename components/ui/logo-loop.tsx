@@ -275,7 +275,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
               'inline-flex items-center',
               'motion-reduce:transition-none',
               scaleOnHover &&
-                'transition-transform duration-300 ease-in-out group-hover/item:scale-120'
+                'transition-transform duration-base ease-in-out group-hover/item:scale-105'
             )}
             aria-hidden={!!(item as any).href && !(item as any).ariaLabel}
           >
@@ -288,7 +288,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
                className={cx(
                  'h-full w-auto object-contain',
                  'pointer-events-none',
-                 scaleOnHover && 'transition-transform duration-300 ease-in-out group-hover/item:scale-120'
+                  scaleOnHover && 'transition-transform duration-base ease-in-out group-hover/item:scale-105'
                )}
                src={(item as any).src}
                alt={(item as any).alt ?? ''}
@@ -307,7 +307,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
           <a
             className={cx(
               'inline-flex items-center no-underline rounded',
-              'transition-opacity duration-200 ease-linear',
+              'transition-opacity duration-base ease-in-out',
               'hover:opacity-80',
               'focus-visible:outline focus-visible:outline-current focus-visible:outline-offset-2'
             )}

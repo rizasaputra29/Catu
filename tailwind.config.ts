@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  darkMode: ['class'],
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -9,15 +8,21 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-onest)', 'system-ui', 'sans-serif'],
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        sm: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '20px',
+        '2xl': '24px',
+        pill: '9999px',
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -61,6 +66,14 @@ const config: Config = {
           '5': 'hsl(var(--chart-5))',
         },
       },
+      transitionDuration: {
+        fast: '100ms',
+        base: '200ms',
+        slow: '300ms',
+      },
+      transitionTimingFunction: {
+        cash: 'ease-in-out',
+      },
       keyframes: {
         'accordion-down': {
           from: {
@@ -80,8 +93,8 @@ const config: Config = {
         },
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
+        'accordion-down': 'accordion-down 200ms ease-in-out',
+        'accordion-up': 'accordion-up 200ms ease-in-out',
       },
     },
   },

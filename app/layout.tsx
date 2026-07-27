@@ -1,18 +1,21 @@
 import './globals.css';
-// 1. Import tipe Viewport
 import type { Metadata, Viewport } from 'next';
 import { Onest } from 'next/font/google';
 import { AuthProvider } from '../contexts/AuthContext';
-import { FinanceProvider } from '../contexts/FinanceContext';
+import { Providers } from './providers';
 import { Toaster } from '../components/ui/toaster';
 import LenisProvider from '../components/LenisProvider';
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 
-const onest = Onest({ subsets: ['latin'] });
+const onest = Onest({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-onest',
+});
 
 // 2. Pisahkan konfigurasi Viewport (themeColor, width, scale, dll)
 export const viewport: Viewport = {
-  themeColor: '#000000',
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -20,13 +23,26 @@ export const viewport: Viewport = {
 
 // 3. Konfigurasi Metadata (Judul, Deskripsi, Ikon, Manifest)
 export const metadata: Metadata = {
-  title: 'CashMap',
-  description: 'Track income, expenses, and cash flow for your UMKM business with CashMap',
+  title: 'CATU | Catatan Keuangan',
+  description: 'Track income, expenses, and cash flow for your UMKM business with CATU',
   manifest: '/manifest.json',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  openGraph: {
+    title: 'CATU',
+    description: 'Track income, expenses, and cash flow for your UMKM business with CATU',
+    type: 'website',
+    images: [
+      { url: '/og-image.png', width: 1200, height: 438, alt: 'CATU' }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/og-image.png']
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'CashMap'
+    title: 'CATU'
   },
   formatDetection: {
     telephone: false
@@ -49,14 +65,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={onest.className} suppressHydrationWarning>
+      <body className={`${onest.variable} font-sans antialiased`} suppressHydrationWarning>
         <ServiceWorkerRegister />
         <LenisProvider>
           <AuthProvider>
-            <FinanceProvider>
+            <Providers>
               {children}
               <Toaster />
-            </FinanceProvider>
+            </Providers>
           </AuthProvider>
         </LenisProvider>
       </body>
