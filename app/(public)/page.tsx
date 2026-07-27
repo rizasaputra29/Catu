@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import LogoLoop from '@/components/ui/logo-loop';
+import { BrandLogo } from '@/components/BrandLogo';
 import { 
   ArrowRight, 
   Wallet, 
@@ -25,23 +26,22 @@ export default function Home() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin" />
+        <div className="w-16 h-16 border-4 border-muted border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Animation variants
   const fadeInUp: Variants = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 16 },
     visible: { 
       opacity: 1, 
       y: 0, 
-      transition: { duration: 0.6, ease: "easeOut" } 
+      transition: { duration: 0.5, ease: "easeInOut" } 
     }
   };
 
   const stagger: Variants = {
-    visible: { transition: { staggerChildren: 0.1 } }
+    visible: { transition: { staggerChildren: 0.05 } }
   };
 
   const techStackLogos = [
@@ -56,116 +56,95 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-white text-black overflow-x-hidden font-sans selection:bg-[#D2F65E]">
+    <main className="min-h-screen bg-white text-foreground overflow-x-hidden font-sans selection:bg-primary selection:text-white">
       
-      {/* --- HERO SECTION --- */}
+      {/* HERO SECTION */}
       <section className="pt-12 pb-12 px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeInUp}
-          className="max-w-7xl mx-auto bg-[#D2F65E] rounded-[2.5rem] p-8 md:p-16 relative overflow-hidden shadow-xl min-h-[600px] flex flex-col justify-center"
+          className="max-w-7xl mx-auto bg-gradient-to-br from-[#f4f6ff] to-white rounded-2xl p-8 md:p-16 relative overflow-hidden min-h-[600px] flex flex-col justify-center border border-border shadow-sm"
         >
-          {/* Decorative Abstract Lines */}
-          <div className="absolute top-0 right-0 w-full h-full pointer-events-none opacity-20">
+          <div className="absolute top-0 right-0 w-full h-full pointer-events-none opacity-30">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path d="M80 0 Q 50 50 80 100" stroke="black" strokeWidth="0.5" fill="none" />
-              <path d="M90 0 Q 60 50 90 100" stroke="black" strokeWidth="0.5" fill="none" />
+              <path d="M80 0 Q 50 50 80 100" stroke="currentColor" strokeWidth="0.3" className="text-primary" fill="none" />
+              <path d="M90 0 Q 60 50 90 100" stroke="currentColor" strokeWidth="0.3" className="text-primary" fill="none" />
             </svg>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
-            {/* Left: Text */}
             <div className="space-y-8 relative z-20">
-              {/* LOGO HEADER */}
-              <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 bg-white rounded-xl flex items-center justify-center border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                   <Image 
-                     src="/apple-touch-icon.png" 
-                     alt="CashMap Logo" 
-                     width={40} 
-                     height={40} 
-                     className="object-cover"
-                   />
-                </div>
-                <span className="text-2xl font-bold tracking-tight">CashMap</span>
-              </div>
+               <BrandLogo href="/" size="lg" theme="light" />
               
               <div className="space-y-4">
                 <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">
                   Master your <br/>
                   <span className="italic font-serif font-normal">money</span> flow.
                 </h1>
-                
-                <p className="text-lg md:text-xl font-medium max-w-md opacity-80 leading-relaxed">
+                <p className="text-base font-normal max-w-md text-muted-foreground leading-relaxed">
                   Track income and expenses, run your cash book, and view annual performance. All in one clean, clutter-free dashboard.
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-4 pt-2">
                 <Link href="/auth/register">
-                  <Button className="h-14 px-8 rounded-full bg-black text-white text-lg font-bold hover:scale-105 transition-transform shadow-lg hover:bg-gray-900">
+                  <Button className="h-14 px-8 rounded-pill bg-primary text-primary-foreground text-lg font-medium hover:bg-primary/90 shadow-sm transition-all duration-base ease-in-out">
                     Get Started <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
                 <Link href="/auth/login">
-                  <Button variant="outline" className="h-14 px-8 rounded-full bg-white text-black text-lg font-bold hover:scale-105 transition-transform shadow-lg hover:bg-gray-100">
+                  <Button variant="outline" className="h-14 px-8 rounded-pill text-lg font-medium transition-all duration-base ease-in-out">
                     Login
                   </Button>
                 </Link>
               </div>
             </div>
 
-            {/* Right: App Mockup Images (Using JPG) */}
-            {/* Hidden on mobile, visible on lg screens */}
             <div className="relative hidden lg:block h-[600px] w-full">
-              
-              {/* Image 2: Landing Page (Back) */}
               <motion.div 
                 initial={{ y: -50, opacity: 0, rotate: 6, scale: 0.9 }}
                 animate={{ y: 0, opacity: 1, rotate: 12, scale: 0.9 }}
-                transition={{ duration: 0.8, delay: 0.4, type: "spring" }}
+                transition={{ duration: 0.8, delay: 0.4, ease: "easeInOut" }}
                 className="absolute top-4 right-4 w-[300px] z-10"
               >
                  <Image
-                   src="/landing-mockup.png" // Ubah ke .jpg
-                   alt="CashMap Mobile Landing"
+                   src="/landing-mockup.png"
+                   alt="CATU Mobile Landing"
                    width={600}
                    height={850}
-                   className="w-full h-auto object-cover opacity-90 hover:opacity-100 transition-opacity"
+                   className="w-full h-auto object-cover rounded-xl opacity-90 hover:opacity-100 transition-opacity duration-base ease-in-out"
                    priority
                  />
               </motion.div>
 
-              {/* Image 1: Dashboard (Front) */}
               <motion.div 
                 initial={{ y: 100, opacity: 0, rotate: -5 }}
                 animate={{ y: 40, opacity: 1, rotate: -6 }}
-                transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
+                transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
                 className="absolute top-10 left-10 w-[320px] z-20"
               >
                  <Image
-                   src="/dashboard-mockup.png" // Ubah ke .jpg
-                   alt="CashMap Dashboard"
+                   src="/dashboard-mockup.png"
+                   alt="CATU Dashboard"
                    width={620}
                    height={790}
-                   className="w-full h-auto object-cover"
+                   className="w-full h-auto object-cover rounded-xl"
                    priority
                  />
               </motion.div>
-
             </div>
           </div>
         </motion.div>
       </section>
 
-      {/* --- TECH STACK LOGO LOOP --- */}
+      {/* TECH STACK LOGO LOOP */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-12">Powered By Modern Tech Stack</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-12">Powered By Modern Tech Stack</p>
           
-          <div className="w-full overflow-hidden grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+          <div className="w-full overflow-hidden grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-base ease-in-out">
             <LogoLoop 
               logos={techStackLogos} 
               speed={60} 
@@ -182,7 +161,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FEATURE HIGHLIGHT (DARK CARD) --- */}
+      {/* FEATURE HIGHLIGHT (DARK CARD) */}
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div 
@@ -192,33 +171,31 @@ export default function Home() {
             viewport={{ once: true }}
             className="grid lg:grid-cols-2 gap-8 items-center"
           >
-            {/* Left: Image/Card */}
-            <div className="bg-black text-white rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden min-h-[450px] flex flex-col justify-between shadow-2xl">
-               {/* Abstract Chart Background */}
+            <div className="bg-[#111] text-white rounded-2xl p-8 md:p-12 relative overflow-hidden min-h-[450px] flex flex-col justify-between shadow-lg">
                <div className="absolute inset-0 opacity-20">
                   <svg className="w-full h-full" viewBox="0 0 400 400">
-                    <path d="M0 300 C 100 300, 100 100, 200 150 S 300 50, 400 100 L 400 400 L 0 400 Z" fill="#D2F65E" />
+                    <path d="M0 300 C 100 300, 100 100, 200 150 S 300 50, 400 100 L 400 400 L 0 400 Z" fill="#0000ee" />
                   </svg>
                </div>
 
                <div className="relative z-10">
-                 <div className="inline-block bg-[#D2F65E] text-black px-3 py-1 rounded-full text-sm font-bold mb-6">
+                 <div className="inline-block bg-primary text-white px-3 py-1 rounded-pill text-sm font-medium mb-6">
                     Analytics Feature
                  </div>
-                  <h3 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+                   <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6">
                      Keep your finger on the Cash Flow.
                   </h3>
-                  <p className="text-gray-400 max-w-sm text-lg">
+                  <p className="text-white/60 max-w-sm text-base leading-relaxed">
                      Real-time cash book entries and monthly recaps show exactly where your business stands.
                   </p>
                </div>
 
                <div className="relative z-10 mt-8">
-                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 max-w-xs">
-                     <p className="text-sm text-gray-300 mb-2">Cash Position</p>
+                   <div className="bg-white/10 rounded-2xl p-6 border border-white/10 max-w-xs">
+                     <p className="text-sm text-white/60 mb-2">Cash Position</p>
                      <div className="flex justify-between items-end">
-                       <span className="text-3xl font-bold">Rp 8.5M</span>
-                       <div className="flex items-center gap-1 text-[#D2F65E] text-sm font-bold bg-[#D2F65E]/10 px-2 py-1 rounded-lg">
+                       <span className="text-3xl font-medium">Rp 8.5M</span>
+                       <div className="flex items-center gap-1 text-white text-sm font-medium bg-primary px-2 py-1 rounded-lg">
                          <TrendingUp className="w-3 h-3" /> Stable
                        </div>
                      </div>
@@ -226,11 +203,10 @@ export default function Home() {
                </div>
             </div>
 
-            {/* Right: Text Content */}
             <div className="lg:pl-12 py-8">
-               <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">Full Analytics of your Money.</h2>
-               <p className="text-xl text-gray-600 mb-10 leading-relaxed">
-                 Stop guessing where your money goes. CashMap categorizes every rupiah, visualizes your spending habits, and helps you make smarter financial decisions effortlessly.
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6">Full Analytics of your Money.</h2>
+               <p className="text-base text-muted-foreground mb-10 leading-relaxed">
+                 Stop guessing where your money goes. CATU categorizes every rupiah, visualizes your spending habits, and helps you make smarter financial decisions effortlessly.
                </p>
                
                <div className="space-y-8">
@@ -239,12 +215,12 @@ export default function Home() {
                     { title: "Export & Backup", desc: "Your data is yours. Export to JSON anytime for safekeeping." }
                  ].map((item, idx) => (
                    <div key={idx} className="flex gap-5">
-                      <div className="w-12 h-12 rounded-2xl bg-[#D2F65E] flex items-center justify-center shrink-0 font-bold text-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 font-medium text-xl text-primary">
                         {idx + 1}
                       </div>
                       <div>
-                        <h4 className="text-xl font-bold mb-2">{item.title}</h4>
-                        <p className="text-gray-600 leading-relaxed">{item.desc}</p>
+                        <h4 className="text-xl font-medium mb-2">{item.title}</h4>
+                        <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
                       </div>
                    </div>
                  ))}
@@ -254,12 +230,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FEATURES GRID --- */}
-      <section className="pb-24 bg-white px-4 sm:px-6 lg:px-8 mt-12 rounded-t-[3rem]">
-        <div className="max-w-7xl mx-auto">
+      {/* FEATURES GRID */}
+      <section className="pb-24 bg-muted/30 px-4 sm:px-6 lg:px-8 mt-12 rounded-t-3xl">
+        <div className="max-w-7xl mx-auto pt-24">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Everything you need</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6">Everything you need</h2>
+            <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Powerful features packed into a simple interface designed for clarity.
             </p>
           </div>
@@ -275,32 +251,29 @@ export default function Home() {
                { 
                  icon: Wallet, 
                  title: "Transaction Tracking", 
-                 desc: "Log income and expenses in seconds. Edit, delete, and view history with ease.",
-                 color: "bg-white" 
+                 desc: "Log income and expenses in seconds. Edit, delete, and view history with ease."
                },
                { 
                  icon: BookOpen, 
                  title: "Cash Book", 
-                 desc: "Monthly income, expenses, and running balance in one neat table.",
-                 color: "bg-white" 
+                 desc: "Monthly income, expenses, and running balance in one neat table."
                },
                { 
                  icon: BarChart3, 
                  title: "Annual Recap", 
-                 desc: "Yearly totals and performance chart so you can see business growth at a glance.",
-                 color: "bg-white" 
+                 desc: "Yearly totals and performance chart so you can see business growth at a glance."
                }
              ].map((feature, i) => (
               <motion.div 
                 key={i}
                 variants={fadeInUp}
-                className={`${feature.color} p-10 rounded-[2.5rem] border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-6px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all duration-300`}
+                className="bg-white p-10 rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-base ease-in-out"
               >
-                <div className="w-14 h-14 bg-[#D2F65E] rounded-2xl flex items-center justify-center mb-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                  <feature.icon className="w-7 h-7 text-black" />
+                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-8">
+                  <feature.icon className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed text-lg">
+                <h3 className="text-2xl font-medium mb-4">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-base">
                   {feature.desc}
                 </p>
               </motion.div>
@@ -308,23 +281,23 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-      {/* --- CTA FOOTER --- */}
-      <section className=" text-black py-20 px-4 sm:px-6 lg:px-8">
+
+      {/* CTA FOOTER */}
+      <section className="bg-white py-20 px-4 sm:px-6 lg:px-8">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
           className="max-w-4xl mx-auto text-center"
         >
-          
-          <div className="mt-16 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-            <p>&copy; 2025 CashMap. All rights reserved.</p>
+          <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+            <p>&copy; 2025 CATU. All rights reserved.</p>
             
-            {/* Quick Links / Socials */}
             <div className="flex gap-6 mt-4 md:mt-0 items-center">
-              <Link href="https://github.com/rizasaputra29" className="hover:text-[#7089ca] transition-colors"><Github className="w-5 h-5" /></Link>
-              <Link href="https://www.linkedin.com/in/rizasaputra29/" className="hover:text-[#4f7de8] transition-colors"><Linkedin className="w-5 h-5" /></Link>
-              <Link href="https://www.instagram.com/rizasaputra29/" className="hover:text-[#ef4d4d] transition-colors"><Instagram className="w-5 h-5" /></Link>
+              <Link href="https://github.com/rizasaputra29" className="hover:text-primary transition-colors duration-base ease-in-out"><Github className="w-5 h-5" /></Link>
+              <Link href="https://www.linkedin.com/in/rizasaputra29/" className="hover:text-primary transition-colors duration-base ease-in-out"><Linkedin className="w-5 h-5" /></Link>
+              <Link href="https://www.instagram.com/rizasaputra29/" className="hover:text-primary transition-colors duration-base ease-in-out"><Instagram className="w-5 h-5" /></Link>
             </div>
           </div>
         </motion.div>

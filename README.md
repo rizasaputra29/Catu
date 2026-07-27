@@ -1,8 +1,8 @@
 <div align="center">
 
-  # CashMap
+  # CATU
 
-![CashMap Logo](public/apple-touch-icon.png)
+![CATU Logo](public/apple-touch-icon.png)
 
 **Master Your Money Flow.** Track income and expenses, run a simple cash book, and review annual performance. All in one clean, clutter-free dashboard built for UMKM businesses.
 
@@ -21,7 +21,7 @@
 
 ## 📖 About the Project
 
-**CashMap** is a modern finance tracker built as a **Progressive Web App (PWA)**. It helps UMKM owners and individuals keep full control of their money flow with smart categorization, monthly cash book tracking, and yearly recap analytics.
+**CATU** is a modern finance tracker built as a **Progressive Web App (PWA)**. It helps UMKM owners and individuals keep full control of their money flow with smart categorization, monthly cash book tracking, and yearly recap analytics.
 
 ### ✨ Key Features
 

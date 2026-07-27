@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'CashMap',
-    short_name: 'CashMap',
-    description: 'Track income, expenses, and cash flow for your UMKM business with CashMap',
+    name: 'CATU',
+    short_name: 'CATU',
+    description: 'Track income, expenses, and cash flow for your UMKM business with CATU',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',

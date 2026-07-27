@@ -1,9 +1,9 @@
 {
     "openapi": "3.0.0",
     "info": {
-      "title": "CashMap API",
+      "title": "CATU API",
       "version": "1.0.0",
-      "description": "API documentation for CashMap UMKM Cash Book Tracker"
+      "description": "API documentation for CATU UMKM Cash Book Tracker"
     },
     "paths": {
       "/api/auth/register": {

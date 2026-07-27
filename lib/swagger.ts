@@ -6,9 +6,9 @@ export const getApiDocs = async () => {
     definition: {
       openapi: '3.0.0',
       info: {
-        title: 'CashMap API',
+        title: 'CATU API',
         version: '1.0',
-        description: 'API documentation for CashMap financial tracker',
+        description: 'API documentation for CATU financial tracker',
       },
       components: {
         securitySchemes: {

@@ -54,7 +54,7 @@ export function InstallPrompt() {
       <Button 
         onClick={handleInstallClick}
         variant="outline" 
-        className="h-9 rounded-full border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-colors gap-2"
+        className="h-9 rounded-pill border border-border text-foreground font-normal hover:bg-muted hover:text-foreground transition-all duration-base ease-in-out gap-2"
       >
         <Download className="w-4 h-4" /> Install App
       </Button>
