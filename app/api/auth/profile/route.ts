@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     const userId = await getAuthUser();
 
     if (!userId) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -26,13 +26,13 @@ export async function GET(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      return NextResponse.json({ message: 'Pengguna tidak ditemukan' }, { status: 404 });
     }
 
     return NextResponse.json(user as ClientUser);
   } catch (error) {
     console.error('GET Profile Error:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
   }
 }
 
@@ -42,7 +42,7 @@ export async function PUT(request: Request) {
     const userId = await getAuthUser();
 
     if (!userId) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
     }
 
     const dataToUpdate = await request.json();
@@ -54,7 +54,7 @@ export async function PUT(request: Request) {
     if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
     
     if (Object.keys(updateData).length === 0) {
-        return NextResponse.json({ message: 'No valid fields' }, { status: 400 });
+        return NextResponse.json({ message: 'Tidak ada data yang valid' }, { status: 400 });
     }
 
     const updatedUser = await prisma.user.update({
@@ -66,7 +66,7 @@ export async function PUT(request: Request) {
     return NextResponse.json(updatedUser as ClientUser);
   } catch (error) {
     console.error('PUT Profile Error:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
   }
 }
 
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     const { email, securityAnswer, newPassword } = await request.json();
 
     if (!email || !securityAnswer || !newPassword) {
-        return NextResponse.json({ message: 'All fields required' }, { status: 400 });
+        return NextResponse.json({ message: 'Semua kolom wajib diisi' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ 
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
     });
     
     if (!user) {
-        return NextResponse.json({ message: 'Reset failed' }, { status: 400 });
+        return NextResponse.json({ message: 'Reset gagal' }, { status: 400 });
     }
     
     const answerValid = await comparePassword(securityAnswer, user.securityAnswer);
@@ -98,12 +98,12 @@ export async function POST(request: Request) {
             data: { password: hashedPassword }, 
         });
 
-        return NextResponse.json({ message: 'Password reset successful' });
+        return NextResponse.json({ message: 'Reset kata sandi berhasil' });
     } else {
-        return NextResponse.json({ message: 'Reset failed' }, { status: 400 }); 
+        return NextResponse.json({ message: 'Reset gagal' }, { status: 400 }); 
     }
   } catch (error) {
     console.error('Forgot Password Error:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
   }
 }

@@ -24,14 +24,14 @@ export interface LedgerResponse {
 // GET: Fetch transactions for a specific month
 export async function GET(request: Request) {
     const userId = getUserIdFromRequest(request);
-    if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const year = parseInt(searchParams.get('year') || '');
     const month = parseInt(searchParams.get('month') || '');
 
     if (isNaN(year) || isNaN(month) || month < 1 || month > 12) {
-        return NextResponse.json({ message: 'Invalid year or month' }, { status: 400 });
+        return NextResponse.json({ message: 'Tahun atau bulan tidak valid' }, { status: 400 });
     }
 
     try {
@@ -73,6 +73,6 @@ export async function GET(request: Request) {
 
         return NextResponse.json(response);
     } catch (error) {
-        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
     }
 }

@@ -1,307 +1,471 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import LogoLoop from '@/components/ui/logo-loop';
-import { BrandLogo } from '@/components/BrandLogo';
-import { 
-  ArrowRight, 
-  Wallet, 
-  BookOpen, 
-  BarChart3, 
-  TrendingUp,
+import { LandingNavbar } from '@/components/landing/LandingNavbar';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ArrowRight,
+  Wallet,
+  BarChart3,
+  Smartphone,
+  ShieldCheck,
+  ChevronDown,
   Github,
   Linkedin,
-  Instagram
+  Instagram,
 } from 'lucide-react';
-import { motion, Variants } from 'framer-motion';
+
+const BRAND = {
+  blue: '#3B6CB8',
+  darkBlue: '#2A5A9E',
+  lime: '#D4EC4A',
+} as const;
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeInOut' } },
+} as const;
+
+const stagger = {
+  visible: { transition: { staggerChildren: 0.08 } },
+} as const;
+
+const navLinks = [
+  { label: 'Beranda', href: '#home' },
+  { label: 'Tentang Kami', href: '#about' },
+  { label: 'Kegunaan', href: '#training' },
+  { label: 'FAQ', href: '#faq' },
+];
+
+const benefitCards = [
+  {
+    icon: Wallet,
+    title: 'Pencatatan Cepat',
+    desc: 'Catat pemasukan dan pengeluaran dalam hitungan detik.',
+  },
+  {
+    icon: BarChart3,
+    title: 'Laporan Visual',
+    desc: 'Lihat ringkasan bulanan dan tahunan secara jelas.',
+  },
+  {
+    icon: Smartphone,
+    title: 'Akses di Mana Saja',
+    desc: 'Gunakan CATU di ponsel, tablet, maupun desktop.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Data Tetap Aman',
+    desc: 'Privasi dan keamanan data keuangan Anda terjaga.',
+  },
+];
+
+const trainingRows = [
+  {
+    title: 'UNTUK PRIBADI',
+    bullets: [
+      'Atur pemasukan & pengeluaran harian',
+      'Pantau saldo dompet dan tabungan',
+      'Lihat ringkasan bulanan otomatis',
+    ],
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    title: 'UNTUK BISNIS',
+    bullets: [
+      'Kelola buku kas usaha dengan rapi',
+      'Kategorikan transaksi bisnis secara otomatis',
+      'Ekspor laporan untuk pembukuan',
+    ],
+    image: 'https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    title: 'UNTUK TIM',
+    bullets: [
+      'Akses bersama untuk tim kecil',
+      'Hak akses sesuai peran masing-masing',
+      'Pantau arus kas secara real-time',
+    ],
+    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
+  },
+];
+
+const faqItems = [
+  {
+    question: 'Apakah CATU gratis digunakan?',
+    answer:
+      'Ya, CATU dapat digunakan secara gratis untuk kebutuhan pencatatan pribadi dan bisnis kecil.',
+  },
+  {
+    question: 'Bagaimana cara menyimpan data saya?',
+    answer:
+      'Data Anda tersimpan di cloud dan dapat diakses kapan saja dari perangkat yang Anda gunakan.',
+  },
+  {
+    question: 'Bisakah saya mengunduh laporan keuangan?',
+    answer:
+      'Tentu. Anda bisa mengekspor laporan transaksi dan ringkasan keuangan kapan saja.',
+  },
+  {
+    question: 'Apakah CATU aman untuk data keuangan?',
+    answer:
+      'Keamanan data adalah prioritas kami. Kami menggunakan enkripsi dan praktik keamanan terbaik.',
+  },
+];
+
 
 export default function Home() {
-  const { user, isLoading } = useAuth();
-  const router = useRouter();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-16 h-16 border-4 border-muted border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const fadeInUp: Variants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.5, ease: "easeInOut" } 
-    }
-  };
-
-  const stagger: Variants = {
-    visible: { transition: { staggerChildren: 0.05 } }
-  };
-
-  const techStackLogos = [
-    { src: "https://cdn.worldvectorlogo.com/logos/next-js.svg", alt: "Next.js", title: "Next.js", width: 100, height: 40 },
-    { src: "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg", alt: "React", title: "React", width: 100, height: 40 },
-    { src: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg", alt: "TypeScript", title: "TypeScript", width: 100, height: 40 },
-    { src: "https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg", alt: "Tailwind CSS", title: "Tailwind CSS", width: 100, height: 40 },
-    { src: "https://cdn.worldvectorlogo.com/logos/prisma-3.svg", alt: "Prisma", title: "Prisma", width: 100, height: 40 },
-    { src: "https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg", alt: "PostgreSQL", title: "PostgreSQL", width: 100, height: 40 },
-    { src: "https://lucide.dev/library-logos/shadcn-ui-dark.svg", alt: "Shadcn UI", title: "Shadcn UI", width: 100, height: 40 },
-    { src: "https://cdn.worldvectorlogo.com/logos/framer-motion.svg", alt: "Framer Motion", title: "Framer Motion", width: 100, height: 40 },
-  ];
+  const [activeTraining, setActiveTraining] = useState(0);
+  const [activeFaq, setActiveFaq] = useState<number | null>(0);
 
   return (
-    <main className="min-h-screen bg-white text-foreground overflow-x-hidden font-sans selection:bg-primary selection:text-white">
-      
-      {/* HERO SECTION */}
-      <section className="pt-12 pb-12 px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUp}
-          className="max-w-7xl mx-auto bg-gradient-to-br from-[#f4f6ff] to-white rounded-2xl p-8 md:p-16 relative overflow-hidden min-h-[600px] flex flex-col justify-center border border-border shadow-sm"
-        >
-          <div className="absolute top-0 right-0 w-full h-full pointer-events-none opacity-30">
-            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path d="M80 0 Q 50 50 80 100" stroke="currentColor" strokeWidth="0.3" className="text-primary" fill="none" />
-              <path d="M90 0 Q 60 50 90 100" stroke="currentColor" strokeWidth="0.3" className="text-primary" fill="none" />
-            </svg>
-          </div>
+    <main
+      className="min-h-screen bg-white text-foreground overflow-x-hidden font-sans"
+      style={{ '--brand-blue': BRAND.blue, '--brand-dark-blue': BRAND.darkBlue, '--brand-lime': BRAND.lime } as React.CSSProperties}
+    >
+      {/* HEADER */}
+      <LandingNavbar menuItems={navLinks} />
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
-            <div className="space-y-8 relative z-20">
-               <BrandLogo href="/" size="lg" theme="light" />
-              
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">
-                  Master your <br/>
-                  <span className="italic font-serif font-normal">money</span> flow.
-                </h1>
-                <p className="text-base font-normal max-w-md text-muted-foreground leading-relaxed">
-                  Track income and expenses, run your cash book, and view annual performance. All in one clean, clutter-free dashboard.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-4 pt-2">
+      {/* HERO */}
+      <section id="home" className="bg-[var(--brand-blue)] min-h-[100dvh] flex items-center pt-32 pb-16 md:pt-40 md:pb-24 rounded-b-[2.5rem] md:rounded-b-[3.5rem]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="space-y-8"
+            >
+              <p className="text-[var(--brand-lime)] text-sm font-semibold tracking-widest uppercase">
+                #1 Aplikasi Keuangan Pribadi
+              </p>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white uppercase tracking-tight leading-[1.05]">
+                Kelola Keuangan
+                <br />
+                <span className="text-[var(--brand-lime)]">Lebih Teratur</span>
+              </h1>
+              <p className="text-white/80 text-base md:text-lg max-w-lg leading-relaxed">
+                CATU membantu Anda mencatat pemasukan, pengeluaran, dan arus kas
+                dengan tampilan yang bersih dan mudah dipahami.
+              </p>
+              <div className="flex flex-wrap gap-4">
                 <Link href="/auth/register">
-                  <Button className="h-14 px-8 rounded-pill bg-primary text-primary-foreground text-lg font-medium hover:bg-primary/90 shadow-sm transition-all duration-base ease-in-out">
-                    Get Started <ArrowRight className="ml-2 w-5 h-5" />
+                  <Button className="h-14 px-8 rounded-full bg-[var(--brand-lime)] text-[var(--brand-blue)] text-base font-semibold hover:bg-[var(--brand-lime)]/90 shadow-lg shadow-black/10">
+                    Daftar Sekarang <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
                 <Link href="/auth/login">
-                  <Button variant="outline" className="h-14 px-8 rounded-pill text-lg font-medium transition-all duration-base ease-in-out">
-                    Login
+                  <Button
+                    variant="outline"
+                    className="h-14 px-8 rounded-full border-white text-[var(--brand-blue)] hover:bg-white hover:text-[var(--brand-blue)] text-base font-semibold"
+                  >
+                    Masuk
                   </Button>
                 </Link>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="relative hidden lg:block h-[600px] w-full">
-              <motion.div 
-                initial={{ y: -50, opacity: 0, rotate: 6, scale: 0.9 }}
-                animate={{ y: 0, opacity: 1, rotate: 12, scale: 0.9 }}
-                transition={{ duration: 0.8, delay: 0.4, ease: "easeInOut" }}
-                className="absolute top-4 right-4 w-[300px] z-10"
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+              className="relative hidden lg:block h-[500px] xl:h-[560px]"
+            >
+              <motion.div
+                variants={fadeInUp}
+                className="absolute top-2 right-0 xl:right-8 w-[280px] xl:w-[320px] z-10"
               >
-                 <Image
-                   src="/landing-mockup.png"
-                   alt="CATU Mobile Landing"
-                   width={600}
-                   height={850}
-                   className="w-full h-auto object-cover rounded-xl opacity-90 hover:opacity-100 transition-opacity duration-base ease-in-out"
-                   priority
-                 />
+                <Image
+                  src="/landing-mockup.png"
+                  alt="Tampilan aplikasi CATU di ponsel"
+                  width={460}
+                  height={660}
+                  className="w-full h-auto"
+                  priority
+                />
               </motion.div>
-
-              <motion.div 
-                initial={{ y: 100, opacity: 0, rotate: -5 }}
-                animate={{ y: 40, opacity: 1, rotate: -6 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
-                className="absolute top-10 left-10 w-[320px] z-20"
+              <motion.div
+                variants={fadeInUp}
+                className="absolute top-8 left-0 xl:left-8 w-[320px] xl:w-[380px] z-20"
               >
-                 <Image
-                   src="/dashboard-mockup.png"
-                   alt="CATU Dashboard"
-                   width={620}
-                   height={790}
-                   className="w-full h-auto object-cover rounded-xl"
-                   priority
-                 />
+                <Image
+                  src="/dashboard-mockup.png"
+                  alt="Dasbor keuangan CATU"
+                  width={460}
+                  height={660}
+                  className="w-full h-auto"
+                  priority
+                />
               </motion.div>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* TECH STACK LOGO LOOP */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-12">Powered By Modern Tech Stack</p>
-          
-          <div className="w-full overflow-hidden grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-base ease-in-out">
-            <LogoLoop 
-              logos={techStackLogos} 
-              speed={60} 
-              direction="left"
-              logoHeight={40}
-              gap={40}
-              pauseOnHover={true}
-              scaleOnHover={true}
-              fadeOut={true}
-              fadeOutColor="#ffffff"
-              ariaLabel="Tech Stack Logos"
-            />
+              <div className="absolute bottom-10 right-20 w-40 h-40 rounded-full bg-[var(--brand-lime)]/20 blur-3xl" />
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* FEATURE HIGHLIGHT (DARK CARD) */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8">
+      {/* ABOUT US / PROFESSIONAL APPROACH */}
+      <section id="about" className="py-20 md:py-28 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
-            variants={fadeInUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid lg:grid-cols-2 gap-8 items-center"
-          >
-            <div className="bg-[#111] text-white rounded-2xl p-8 md:p-12 relative overflow-hidden min-h-[450px] flex flex-col justify-between shadow-lg">
-               <div className="absolute inset-0 opacity-20">
-                  <svg className="w-full h-full" viewBox="0 0 400 400">
-                    <path d="M0 300 C 100 300, 100 100, 200 150 S 300 50, 400 100 L 400 400 L 0 400 Z" fill="#0000ee" />
-                  </svg>
-               </div>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="relative"
+            >
+              <div className="aspect-[4/5] rounded-[2rem] overflow-hidden bg-[var(--brand-blue)]/10">
+                <Image
+                  src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80"
+                  alt="Mengelola keuangan dengan CATU"
+                  width={800}
+                  height={1000}
+                  className="w-full h-full object-cover"
+                  unoptimized
+                />
+              </div>
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 rounded-full bg-[var(--brand-lime)] -z-10" />
+            </motion.div>
 
-               <div className="relative z-10">
-                 <div className="inline-block bg-primary text-white px-3 py-1 rounded-pill text-sm font-medium mb-6">
-                    Analytics Feature
-                 </div>
-                   <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6">
-                     Keep your finger on the Cash Flow.
-                  </h3>
-                  <p className="text-white/60 max-w-sm text-base leading-relaxed">
-                     Real-time cash book entries and monthly recaps show exactly where your business stands.
-                  </p>
-               </div>
-
-               <div className="relative z-10 mt-8">
-                   <div className="bg-white/10 rounded-2xl p-6 border border-white/10 max-w-xs">
-                     <p className="text-sm text-white/60 mb-2">Cash Position</p>
-                     <div className="flex justify-between items-end">
-                       <span className="text-3xl font-medium">Rp 8.5M</span>
-                       <div className="flex items-center gap-1 text-white text-sm font-medium bg-primary px-2 py-1 rounded-lg">
-                         <TrendingUp className="w-3 h-3" /> Stable
-                       </div>
-                     </div>
-                   </div>
-               </div>
-            </div>
-
-            <div className="lg:pl-12 py-8">
-                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6">Full Analytics of your Money.</h2>
-               <p className="text-base text-muted-foreground mb-10 leading-relaxed">
-                 Stop guessing where your money goes. CATU categorizes every rupiah, visualizes your spending habits, and helps you make smarter financial decisions effortlessly.
-               </p>
-               
-               <div className="space-y-8">
-                 {[
-                    { title: "Smart Categorization", desc: "Automatically sort transactions into Food, Transport, and more." },
-                    { title: "Export & Backup", desc: "Your data is yours. Export to JSON anytime for safekeeping." }
-                 ].map((item, idx) => (
-                   <div key={idx} className="flex gap-5">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 font-medium text-xl text-primary">
-                        {idx + 1}
-                      </div>
-                      <div>
-                        <h4 className="text-xl font-medium mb-2">{item.title}</h4>
-                        <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
-                      </div>
-                   </div>
-                 ))}
-               </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* FEATURES GRID */}
-      <section className="pb-24 bg-muted/30 px-4 sm:px-6 lg:px-8 mt-12 rounded-t-3xl">
-        <div className="max-w-7xl mx-auto pt-24">
-          <div className="text-center mb-16">
-             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6">Everything you need</h2>
-            <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Powerful features packed into a simple interface designed for clarity.
-            </p>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+              className="space-y-8"
+            >
+              <motion.div variants={fadeInUp} className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight uppercase">
+                  Pendekatan{' '}
+                  <span className="text-[var(--brand-lime)]">Profesional</span>
+                </h2>
+                <p className="text-muted-foreground leading-relaxed max-w-lg">
+                  CATU dirancang untuk membantu Anda mengambil keputusan keuangan
+                  yang lebih baik. Dengan tampilan yang sederhana, setiap transaksi
+                  tercatat rapi dan laporan tersaji secara otomatis.
+                </p>
+                <p className="text-muted-foreground leading-relaxed max-w-lg">
+                  Baik untuk kebutuhan pribadi maupun bisnis kecil, CATU memberikan
+                  fondasi pembukuan yang andal tanpa perlu spreadsheet yang rumit.
+                </p>
+              </motion.div>
+            </motion.div>
           </div>
 
-          <motion.div 
-            variants={stagger}
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
+            variants={stagger}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-16 md:mt-24"
           >
-             {[
-               { 
-                 icon: Wallet, 
-                 title: "Transaction Tracking", 
-                 desc: "Log income and expenses in seconds. Edit, delete, and view history with ease."
-               },
-               { 
-                 icon: BookOpen, 
-                 title: "Cash Book", 
-                 desc: "Monthly income, expenses, and running balance in one neat table."
-               },
-               { 
-                 icon: BarChart3, 
-                 title: "Annual Recap", 
-                 desc: "Yearly totals and performance chart so you can see business growth at a glance."
-               }
-             ].map((feature, i) => (
-              <motion.div 
+            {benefitCards.map((card, i) => (
+              <motion.div
                 key={i}
                 variants={fadeInUp}
-                className="bg-white p-10 rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-base ease-in-out"
+                className="bg-[var(--brand-blue)] rounded-2xl p-7 text-white space-y-4 hover:-translate-y-1 transition-transform duration-300"
               >
-                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-8">
-                  <feature.icon className="w-7 h-7 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
+                  <card.icon className="w-6 h-6 text-[var(--brand-lime)]" />
                 </div>
-                <h3 className="text-2xl font-medium mb-4">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed text-base">
-                  {feature.desc}
-                </p>
+                <h3 className="font-semibold text-lg">{card.title}</h3>
+                <p className="text-white/70 text-sm leading-relaxed">{card.desc}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* CTA FOOTER */}
-      <section className="bg-white py-20 px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="max-w-4xl mx-auto text-center"
-        >
-          <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-            <p>&copy; 2025 CATU. All rights reserved.</p>
-            
-            <div className="flex gap-6 mt-4 md:mt-0 items-center">
-              <Link href="https://github.com/rizasaputra29" className="hover:text-primary transition-colors duration-base ease-in-out"><Github className="w-5 h-5" /></Link>
-              <Link href="https://www.linkedin.com/in/rizasaputra29/" className="hover:text-primary transition-colors duration-base ease-in-out"><Linkedin className="w-5 h-5" /></Link>
-              <Link href="https://www.instagram.com/rizasaputra29/" className="hover:text-primary transition-colors duration-base ease-in-out"><Instagram className="w-5 h-5" /></Link>
+      {/* BANNER */}
+      <section className="p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto mb-12 sm:mb-6 lg:mb-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            className="relative rounded-[2rem] overflow-hidden min-h-[360px] md:min-h-[420px] flex items-center"
+          >
+            <Image
+              src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=1600&q=80"
+              alt="Mencatat arus kas"
+              fill
+              className="object-cover"
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-[var(--brand-blue)]/75" />
+            <div className="relative z-10 max-w-3xl px-8 md:px-14 py-12">
+              <p className="text-white text-lg md:text-2xl font-semibold leading-relaxed">
+                Pantau arus kas dan catatan transaksi harian dengan mudah, baik
+                untuk pribadi maupun bisnis kecil Anda.
+              </p>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </section>
+
+      {/* TRAINING */}
+      <section id="training" className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[var(--brand-blue)]">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            className="mb-12 md:mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight uppercase inline-block text-white">
+              Kegunaan
+              <span className="block h-1.5 w-24 bg-[var(--brand-lime)] mt-3 rounded-full" />
+            </h2>
+          </motion.div>
+
+          <div className="space-y-4">
+            {trainingRows.map((row, i) => {
+              const isOpen = activeTraining === i;
+              return (
+                <motion.div
+                  key={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeInUp}
+                  className="rounded-2xl border border-white/10 overflow-hidden bg-white"
+                >
+                  <button
+                    onClick={() => setActiveTraining(isOpen ? -1 : i)}
+                    className="w-full flex items-center justify-between p-6 md:p-8 text-left hover:bg-muted/30 transition-colors"
+                  >
+                    <span className="text-lg md:text-xl font-bold tracking-wide text-gray-900">
+                      {row.title}
+                    </span>
+                    <ChevronDown
+                      className={`w-6 h-6 text-[var(--brand-blue)] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-6 md:p-8 pt-0 grid md:grid-cols-2 gap-8 items-center">
+                          <div className="space-y-4">
+                            {row.bullets.map((bullet, idx) => (
+                              <div key={idx} className="flex items-start gap-3">
+                                <span className="mt-2 w-2 h-2 rounded-full bg-[var(--brand-lime)] shrink-0" />
+                                <p className="text-muted-foreground leading-relaxed">{bullet}</p>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="rounded-2xl overflow-hidden aspect-[4/3]">
+                            <Image
+                              src={row.image}
+                              alt={row.title}
+                              width={800}
+                              height={600}
+                              className="w-full h-full object-cover"
+                              unoptimized
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-muted/20">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            className="mb-12 md:mb-16 text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight uppercase inline-block">
+              FAQ
+              <span className="block h-1.5 w-16 bg-[var(--brand-lime)] mt-3 rounded-full mx-auto" />
+            </h2>
+          </motion.div>
+
+          <div className="space-y-4">
+            {faqItems.map((item, i) => {
+              const isOpen = activeFaq === i;
+              return (
+                <motion.div
+                  key={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeInUp}
+                  className="bg-white rounded-2xl border border-border overflow-hidden"
+                >
+                  <button
+                    onClick={() => setActiveFaq(isOpen ? null : i)}
+                    className="w-full flex items-center justify-between p-6 text-left"
+                  >
+                    <span className="font-semibold text-base md:text-lg pr-4">{item.question}</span>
+                    <ChevronDown
+                      className={`w-5 h-5 text-[var(--brand-blue)] shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 pb-6 text-muted-foreground leading-relaxed">
+                          {item.answer}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-white py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-sm text-muted-foreground">
+            &copy; 2025 CATU. Hak cipta dilindungi.
+          </p>
+          <div className="flex gap-6 items-center">
+            <Link href="https://github.com/rizasaputra29" className="text-muted-foreground hover:text-[var(--brand-blue)] transition-colors">
+              <Github className="w-5 h-5" />
+            </Link>
+            <Link href="https://www.linkedin.com/in/rizasaputra29/" className="text-muted-foreground hover:text-[var(--brand-blue)] transition-colors">
+              <Linkedin className="w-5 h-5" />
+            </Link>
+            <Link href="https://www.instagram.com/rizasaputra29/" className="text-muted-foreground hover:text-[var(--brand-blue)] transition-colors">
+              <Instagram className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

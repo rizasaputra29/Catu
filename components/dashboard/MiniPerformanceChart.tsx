@@ -36,7 +36,7 @@ export function MiniPerformanceChart() {
           })));
         }
       } catch (e) {
-        console.error('Failed to fetch performance data', e);
+          console.error('Gagal memuat data performa', e);
       } finally {
         setIsLoading(false);
       }
@@ -50,7 +50,7 @@ export function MiniPerformanceChart() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
-            <h3 className="font-semibold text-lg">Performance</h3>
+            <h3 className="font-semibold text-lg">Performa</h3>
           </div>
           <Link href="/annual-recap">
             <Button variant="ghost" size="sm" className="rounded-full font-medium hover:bg-muted transition-all duration-base ease-in-out">
@@ -58,25 +58,25 @@ export function MiniPerformanceChart() {
             </Button>
           </Link>
         </div>
-        <p className="text-xs text-muted-foreground font-medium">Monthly income vs expense</p>
+        <p className="text-xs text-muted-foreground font-medium">Pemasukan vs pengeluaran bulanan</p>
       </CardHeader>
       <CardContent className="flex-1 min-h-[200px]">
         {isLoading ? (
-          <div className="h-full flex items-center justify-center text-sm text-muted-foreground">Loading...</div>
+          <div className="h-full flex items-center justify-center text-sm text-muted-foreground">Memuat...</div>
         ) : data.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-sm text-muted-foreground">No data</div>
+          <div className="h-full flex items-center justify-center text-sm text-muted-foreground">Tidak ada data</div>
         ) : (
           <ResponsiveContainer width="100%" height="100%" minHeight={180}>
             <BarChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
               <XAxis dataKey="monthName" tick={{ fontSize: 10, fontWeight: 500 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fontWeight: 500 }} axisLine={false} tickLine={false} tickFormatter={(v) => `Rp${v / 1000000}M`} />
               <Tooltip
                 formatter={(value: number) => [`Rp ${value.toLocaleString('id-ID')}`, '']}
                 contentStyle={{ borderRadius: '12px', border: '1px solid hsl(var(--border))', fontWeight: 500, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
               />
-              <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="expense" fill="#64748b" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="income" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="expense" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

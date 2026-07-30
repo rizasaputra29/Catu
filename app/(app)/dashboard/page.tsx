@@ -38,8 +38,8 @@ export default function DashboardPage() {
       const selectedWallet = wallets.find((w) => w.id === data.walletId);
       if (selectedWallet && selectedWallet.balance < data.amount) {
         toast({
-          title: 'Insufficient Balance',
-          description: `Your ${selectedWallet.name} only has ${formatRupiah(selectedWallet.balance)}.`,
+          title: 'Saldo tidak mencukupi',
+          description: `${selectedWallet.name} hanya memiliki saldo ${formatRupiah(selectedWallet.balance)}.`,
           variant: 'destructive',
         });
         return;
@@ -48,10 +48,10 @@ export default function DashboardPage() {
 
     try {
       await createTransaction.mutateAsync(data);
-      toast({ title: 'Success', description: 'Transaction added' });
+      toast({ title: 'Berhasil', description: 'Transaksi berhasil ditambahkan' });
       setIsTxnOpen(false);
     } catch (e) {
-      toast({ title: 'Error', description: 'Failed to save.', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Gagal menyimpan.', variant: 'destructive' });
     }
   };
 
@@ -61,9 +61,9 @@ export default function DashboardPage() {
         {/* Top Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">Dasbor</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Welcome back to your financial map.
+              Selamat datang kembali di peta keuangan Anda.
             </p>
           </div>
 
@@ -73,7 +73,7 @@ export default function DashboardPage() {
               onClick={() => setIsTxnOpen(true)}
               className="h-10 rounded-full bg-primary text-primary-foreground font-medium px-5 shadow-sm hover:shadow transition-all duration-base ease-in-out"
             >
-              <Plus className="w-4 h-4 mr-1.5" /> Quick Add
+              <Plus className="w-4 h-4 mr-1.5" /> Tambah Cepat
             </Button>
           </div>
         </div>
@@ -81,7 +81,7 @@ export default function DashboardPage() {
         {/* Wallets Section */}
         <div className="">
           <h2 className="text-base font-bold text-foreground flex items-center gap-2">
-            <WalletIcon className="w-4 h-4 text-muted-foreground font-bold" /> My Wallets
+            <WalletIcon className="w-4 h-4 text-muted-foreground font-bold" /> Dompet Saya
           </h2>
           <WalletCarousel wallets={wallets} />
         </div>

@@ -28,7 +28,7 @@ interface DataTableProps<TData> {
 export function DataTable<TData>({
   table,
   className,
-  emptyMessage = 'No results.',
+  emptyMessage = 'Tidak ada data.',
   loading = false,
   footer,
 }: DataTableProps<TData>) {
@@ -67,7 +67,7 @@ export function DataTable<TData>({
           {loading ? (
             <TableRow>
               <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
-                <span className="text-muted-foreground">Loading...</span>
+                <span className="text-muted-foreground">Memuat...</span>
               </TableCell>
             </TableRow>
           ) : table.getRowModel().rows?.length ? (

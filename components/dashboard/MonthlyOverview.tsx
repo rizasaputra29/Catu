@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { format, subMonths, addMonths, isSameMonth } from 'date-fns';
+import { id } from 'date-fns/locale';
 import type { Transaction, Wallet as WalletType } from '@/lib/types';
 import { formatRupiah } from '@/lib/utils';
 
@@ -53,9 +54,9 @@ export function MonthlyOverview({ transactions, wallets }: MonthlyOverviewProps)
           </Button>
 
           <div className="text-center flex flex-col -space-y-1">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Period</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Periode</span>
             <span className="text-lg font-bold text-black leading-tight">
-              {format(selectedMonth, 'MMMM yyyy')}
+              {format(selectedMonth, 'MMMM yyyy', { locale: id })}
             </span>
           </div>
 
@@ -77,13 +78,13 @@ export function MonthlyOverview({ transactions, wallets }: MonthlyOverviewProps)
         <Card className="col-span-1 md:col-span-2 bg-primary border-0 rounded-2xl relative overflow-hidden shadow-sm">
           <CardContent className="p-8 h-full flex flex-col justify-center relative z-10">
             <div className="flex justify-between items-start mb-2">
-              <p className="text-xs font-semibold text-white/70 uppercase tracking-widest">Current Balance</p>
+              <p className="text-xs font-semibold text-white/70 uppercase tracking-widest">Saldo Saat Ini</p>
               <Wallet className="w-6 h-6 text-white/70" />
             </div>
             <h2 className="text-5xl lg:text-6xl font-bold text-white tracking-tight mb-1">
               {formatRupiah(totalBalance)}
             </h2>
-            <p className="text-sm font-semibold text-white/70">Total available funds</p>
+            <p className="text-sm font-semibold text-white/70">Total dana tersedia</p>
           </CardContent>
 
           {/* Decorative Wallet Pattern */}
@@ -100,11 +101,11 @@ export function MonthlyOverview({ transactions, wallets }: MonthlyOverviewProps)
                 <ArrowUpRight className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Income</span>
-                <span className="text-[10px] font-semibold text-muted-foreground/50">{format(selectedMonth, 'MMM yyyy')}</span>
+                <span className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Pemasukan</span>
+                <span className="text-[10px] font-semibold text-muted-foreground/50">{format(selectedMonth, 'MMM yyyy', { locale: id })}</span>
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground">{formatRupiah(income)}</p>
+            <p className="text-3xl font-bold text-emerald-600">{formatRupiah(income)}</p>
           </CardContent>
         </Card>
 
@@ -112,15 +113,15 @@ export function MonthlyOverview({ transactions, wallets }: MonthlyOverviewProps)
         <Card className="col-span-1 bg-white border border-border rounded-2xl flex flex-col justify-center shadow-sm">
           <CardContent className="p-8">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center">
-                <ArrowDownRight className="w-6 h-6 text-foreground" />
+              <div className="w-12 h-12 bg-destructive/10 rounded-2xl flex items-center justify-center">
+                <ArrowDownRight className="w-6 h-6 text-destructive" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Expenses</span>
-                <span className="text-[10px] font-semibold text-muted-foreground/50">{format(selectedMonth, 'MMM yyyy')}</span>
+                <span className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Pengeluaran</span>
+                <span className="text-[10px] font-semibold text-muted-foreground/50">{format(selectedMonth, 'MMM yyyy', { locale: id })}</span>
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground">{formatRupiah(expense)}</p>
+            <p className="text-3xl font-bold text-destructive">{formatRupiah(expense)}</p>
           </CardContent>
         </Card>
 

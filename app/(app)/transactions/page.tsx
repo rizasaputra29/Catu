@@ -239,7 +239,7 @@ function TransactionsList() {
 
   const handleSaveTransaction = async (formData: any) => {
     if (!formData.type || !formData.category || !formData.walletId) {
-      toast({ title: 'Error', description: 'Please fill all required fields', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Harap isi semua kolom wajib', variant: 'destructive' });
       return;
     }
 
@@ -247,8 +247,8 @@ function TransactionsList() {
       const selectedWallet = wallets?.find((w) => w.id === formData.walletId);
       if (selectedWallet && selectedWallet.balance < formData.amount) {
         toast({
-          title: 'Insufficient Balance',
-          description: `Your ${selectedWallet.name} only has ${formatRupiah(selectedWallet.balance)}.`,
+          title: 'Saldo tidak mencukupi',
+          description: `${selectedWallet.name} hanya memiliki saldo ${formatRupiah(selectedWallet.balance)}.`,
           variant: 'destructive',
         });
         return;
@@ -258,15 +258,15 @@ function TransactionsList() {
     try {
       if (editingTxn) {
         await updateTransaction.mutateAsync({ ...formData, id: editingTxn.id });
-        toast({ title: 'Success', description: 'Transaction updated successfully' });
+        toast({ title: 'Berhasil', description: 'Transaksi berhasil diperbarui' });
       } else {
         await createTransaction.mutateAsync(formData);
-        toast({ title: 'Success', description: 'Transaction added successfully' });
+        toast({ title: 'Berhasil', description: 'Transaksi berhasil ditambahkan' });
       }
       setIsDialogOpen(false);
       setEditingTxn(null);
     } catch (e) {
-      toast({ title: 'Error', description: 'Failed to save transaction.', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Gagal menyimpan transaksi.', variant: 'destructive' });
     }
   };
 
@@ -274,22 +274,22 @@ function TransactionsList() {
     if (!deletingTxn) return;
     try {
       await deleteTransaction.mutateAsync(deletingTxn.id);
-      toast({ title: 'Success', description: 'Transaction deleted' });
+      toast({ title: 'Berhasil', description: 'Transaksi berhasil dihapus' });
     } catch (e) {
-      toast({ title: 'Error', description: 'Failed to delete transaction.', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Gagal menghapus transaksi.', variant: 'destructive' });
     } finally {
       setDeletingTxn(null);
     }
   };
 
-  const incomeCategories = ['Sales', 'Service', 'Other Income'];
-  const expenseCategories = ['Inventory', 'Rent', 'Utilities', 'Salaries', 'Transportation', 'Marketing', 'Equipment', 'Maintenance', 'Other Expense'];
+  const incomeCategories = ['Penjualan', 'Jasa', 'Pendapatan Lain'];
+  const expenseCategories = ['Persediaan', 'Sewa', 'Utilitas', 'Gaji', 'Transportasi', 'Pemasaran', 'Peralatan', 'Pemeliharaan', 'Pengeluaran Lain'];
 
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-3">
-          <List className="w-6 h-6 text-muted-foreground" /> Transactions
+          <List className="w-6 h-6 text-muted-foreground" /> Transaksi
         </h2>
         <Button
           onClick={() => {
@@ -298,7 +298,7 @@ function TransactionsList() {
           }}
           className="h-10 px-5 rounded-full bg-primary text-primary-foreground font-medium shadow-sm hover:shadow transition-all duration-base"
         >
-          <Plus className="w-4 h-4 mr-2" /> Add New
+          <Plus className="w-4 h-4 mr-2" /> Tambah Baru
         </Button>
       </div>
 
@@ -310,20 +310,20 @@ function TransactionsList() {
               <div className="bg-primary/10 p-2 rounded-lg">
                 <Filter className="w-5 h-5 text-primary" />
               </div>
-              <span className="font-semibold text-lg text-foreground">Filters</span>
+              <span className="font-semibold text-lg text-foreground">Filter</span>
               {hasFilters && (
                 <Button variant="ghost" size="sm" onClick={clearFilters} className="ml-auto h-8 rounded-full">
-                  <X className="w-4 h-4 mr-2" /> Clear
+                  <X className="w-4 h-4 mr-2" /> Bersihkan
                 </Button>
               )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">Search</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Cari</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
-                    placeholder="Description or category"
+                    placeholder="Keterangan atau kategori"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     className="h-10 pl-9 rounded-lg bg-background"
@@ -331,7 +331,7 @@ function TransactionsList() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">Type</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Jenis</Label>
                 <Select
                   value={filters.type || 'all'}
                   onValueChange={(value) => setFilters((prev) => ({ ...prev, type: value as TransactionFilters['type'] }))}
@@ -340,14 +340,14 @@ function TransactionsList() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="income">Income</SelectItem>
-                    <SelectItem value="expense">Expense</SelectItem>
+                    <SelectItem value="all">Semua</SelectItem>
+                    <SelectItem value="income">Pemasukan</SelectItem>
+                    <SelectItem value="expense">Pengeluaran</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">Wallet</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Dompet</Label>
                 <Select
                   value={filters.walletId || 'all'}
                   onValueChange={(value) =>
@@ -358,7 +358,7 @@ function TransactionsList() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Wallets</SelectItem>
+                    <SelectItem value="all">Semua Dompet</SelectItem>
                     {wallets?.map((w) => (
                       <SelectItem key={w.id} value={w.id}>
                         {w.name}
@@ -368,7 +368,7 @@ function TransactionsList() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">Category</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Kategori</Label>
                 <Select
                   value={filters.category || 'all'}
                   onValueChange={(value) =>
@@ -379,7 +379,7 @@ function TransactionsList() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="all">Semua Kategori</SelectItem>
                     {[...incomeCategories, ...expenseCategories].map((c) => (
                       <SelectItem key={c} value={c}>
                         {c}
@@ -389,7 +389,7 @@ function TransactionsList() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">From Date</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Dari Tanggal</Label>
                 <div className="relative">
                   <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -401,7 +401,7 @@ function TransactionsList() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">To Date</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Sampai Tanggal</Label>
                 <div className="relative">
                   <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -423,19 +423,19 @@ function TransactionsList() {
           <div className="text-sm text-muted-foreground">
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" /> Loading...
+                <Loader2 className="w-4 h-4 animate-spin" /> Memuat...
               </span>
             ) : (
               <>
-                Showing <strong>{totalItems > 0 ? pagination.pageIndex * pagination.pageSize + 1 : 0}</strong> -{' '}
-                <strong>{Math.min((pagination.pageIndex + 1) * pagination.pageSize, totalItems)}</strong> of{' '}
-                <strong>{totalItems}</strong> transactions
+                Menampilkan <strong>{totalItems > 0 ? pagination.pageIndex * pagination.pageSize + 1 : 0}</strong> -{' '}
+                <strong>{Math.min((pagination.pageIndex + 1) * pagination.pageSize, totalItems)}</strong> dari{' '}
+                <strong>{totalItems}</strong> transaksi
               </>
             )}
           </div>
           <DataTableViewOptions table={table} />
         </div>
-        <DataTable table={table} loading={isLoading} emptyMessage="No transactions found. Try adjusting your filters or add a new one." />
+        <DataTable table={table} loading={isLoading}           emptyMessage="Tidak ada transaksi. Coba sesuaikan filter atau tambahkan yang baru." />
         <div className="p-4 border-t border-border">
           <DataTablePagination table={table} totalItems={totalItems} />
         </div>
@@ -452,9 +452,9 @@ function TransactionsList() {
       <AlertDialog open={Boolean(deletingTxn)} onOpenChange={(open) => !open && setDeletingTxn(null)}>
         <AlertDialogContent className="rounded-2xl border border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-semibold">Delete Transaction?</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl font-semibold">Hapus Transaksi?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This transaction will be permanently removed.
+              Tindakan ini tidak dapat dibatalkan. Transaksi ini akan dihapus secara permanen.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -462,7 +462,7 @@ function TransactionsList() {
               onClick={() => setDeletingTxn(null)}
               className="rounded-full border border-border font-medium"
             >
-              Cancel
+              Batal
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
@@ -472,7 +472,7 @@ function TransactionsList() {
               {deleteTransaction.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               ) : null}
-              Delete
+              Hapus
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -501,18 +501,18 @@ function TransactionsPageTabs() {
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-      <TabsList className="grid w-full max-w-md grid-cols-2 h-11 bg-muted rounded-full p-1 mb-8">
+        <TabsList className="grid w-full max-w-md grid-cols-2 h-11 bg-muted rounded-full p-1 mb-8">
         <TabsTrigger
           value="transactions"
-          className="rounded-full font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all duration-base"
+          className="rounded-full font-medium data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-all duration-base"
         >
-          <List className="w-4 h-4 mr-2" /> Transactions
+          <List className="w-4 h-4 mr-2" /> Transaksi
         </TabsTrigger>
         <TabsTrigger
           value="cash-book"
-          className="rounded-full font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all duration-base"
+          className="rounded-full font-medium data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-all duration-base"
         >
-          <BookOpen className="w-4 h-4 mr-2" /> Cash Book
+          <BookOpen className="w-4 h-4 mr-2" /> Buku Kas
         </TabsTrigger>
       </TabsList>
 
@@ -532,8 +532,8 @@ export default function TransactionsPage() {
     <div className="min-h-screen bg-background pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Transactions</h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage your income, expenses, and monthly cash book</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Transaksi</h1>
+          <p className="text-sm text-muted-foreground mt-1">Kelola pemasukan, pengeluaran, dan buku kas bulanan Anda</p>
         </div>
 
         <Suspense fallback={null}>

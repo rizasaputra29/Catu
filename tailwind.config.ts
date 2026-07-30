@@ -25,6 +25,9 @@ const config: Config = {
         pill: '9999px',
       },
       colors: {
+        brandBlue: '#3B6CB8',
+        brandDarkBlue: '#2A5A9E',
+        brandLime: '#D4EC4A',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -65,6 +68,10 @@ const config: Config = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+      },
+      zIndex: {
+        '60': '60',
+        '70': '70',
       },
       transitionDuration: {
         fast: '100ms',

@@ -47,8 +47,8 @@ export default function ProfilePage() {
     if (info && info.secure_url) {
       setFormData({ ...formData, avatarUrl: info.secure_url });
       toast({
-        title: 'Image Uploaded',
-        description: 'Click "Save Changes" to apply your new avatar.',
+        title: 'Gambar Diunggah',
+        description: 'Klik "Simpan Perubahan" untuk menerapkan avatar baru Anda.',
       });
       setIsEditing(true);
     }
@@ -58,7 +58,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     if (!formData.fullName) {
-      toast({ title: 'Error', description: 'Name is required', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Nama wajib diisi', variant: 'destructive' });
       return;
     }
 
@@ -70,13 +70,13 @@ export default function ProfilePage() {
         });
 
         if (success) {
-            toast({ title: 'Success', description: 'Profile updated successfully' });
+            toast({ title: 'Berhasil', description: 'Profil berhasil diperbarui' });
             setIsEditing(false);
         } else {
-            toast({ title: 'Error', description: 'Failed to update profile.', variant: 'destructive' });
+            toast({ title: 'Gagal', description: 'Gagal memperbarui profil.', variant: 'destructive' });
         }
     } catch(e) {
-        toast({ title: 'Error', description: 'Failed to connect to the server.', variant: 'destructive' });
+        toast({ title: 'Gagal', description: 'Gagal terhubung ke server.', variant: 'destructive' });
     }
   };
 
@@ -93,7 +93,7 @@ export default function ProfilePage() {
   
   const handleBackup = async () => {
     try {
-        toast({ title: 'Backup initiated', description: 'Preparing data for download...', duration: 2000 });
+        toast({ title: 'Cadangan dimulai', description: 'Mempersiapkan data untuk diunduh...', duration: 2000 });
         const blob = await backupMutation.mutateAsync();
 
         let filename = 'catu_backup.json';
@@ -113,9 +113,9 @@ export default function ProfilePage() {
             window.URL.revokeObjectURL(url);
         }, 200);
 
-        toast({ title: 'Backup Successful', description: 'Your backup has started downloading.' });
+        toast({ title: 'Cadangan Berhasil', description: 'Cadangan Anda telah mulai diunduh.' });
     } catch (e) {
-        toast({ title: 'Backup Failed', description: 'Could not connect to server.', variant: 'destructive' });
+        toast({ title: 'Cadangan Gagal', description: 'Tidak dapat terhubung ke server.', variant: 'destructive' });
     }
   };
 
@@ -125,10 +125,10 @@ export default function ProfilePage() {
     setIsImportLoading(true);
     try {
         await importMutation.mutateAsync(file);
-        toast({ title: 'Import Successful', description: 'Data successfully restored. Refreshing...' });
+        toast({ title: 'Impor Berhasil', description: 'Data berhasil dipulihkan. Memuat ulang...' });
         await queryClient.invalidateQueries();
     } catch (e: any) {
-        toast({ title: 'Import Failed', description: e.message || 'Error processing file.', variant: 'destructive' });
+        toast({ title: 'Impor Gagal', description: e.message || 'Kesalahan memproses file.', variant: 'destructive' });
     } finally {
         setIsImportLoading(false);
         if (importInputRef.current) {
@@ -152,8 +152,8 @@ export default function ProfilePage() {
 
           {/* Header */}
           <div className="mb-10">
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground">Profile</h1>
-            <p className="text-muted-foreground mt-2">Manage your account settings and data</p>
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">Profil</h1>
+            <p className="text-muted-foreground mt-2">Kelola pengaturan dan data akun Anda</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -170,7 +170,7 @@ export default function ProfilePage() {
                                 </AvatarFallback>
                             </Avatar>
                              {/* Badge */}
-                             <div className="absolute bottom-2 right-0 bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-1 rounded-full border-2 border-white shadow-sm">
+                             <div className="absolute bottom-2 right-0 bg-accent text-accent-foreground text-[10px] font-semibold px-2 py-1 rounded-full border-2 border-white shadow-sm">
                                  PRO
                              </div>
                         </div>
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                             className="w-full h-10 rounded-full border border-border bg-white hover:bg-muted text-foreground font-medium transition-all duration-base ease-in-out inline-flex items-center justify-center"
                         >
                             <ImageIcon className="w-4 h-4 mr-2" />
-                            Change Avatar
+                            Ubah Avatar
                         </CldUploadButton>
                     </CardContent>
                 </Card>
@@ -201,8 +201,8 @@ export default function ProfilePage() {
                          <ShieldCheck className="w-6 h-6" />
                      </div>
                      <div>
-                         <p className="font-semibold text-lg leading-tight text-foreground">Account Status</p>
-                         <p className="text-sm text-muted-foreground">Active & Secure</p>
+                          <p className="font-semibold text-lg leading-tight text-foreground">Status Akun</p>
+                          <p className="text-sm text-muted-foreground">Aktif & Aman</p>
                      </div>
                 </div>
             </div>
@@ -213,7 +213,7 @@ export default function ProfilePage() {
                 {/* Edit Profile Form */}
                 <Card className="border-border shadow-sm rounded-2xl bg-white">
                     <CardHeader className="px-8 pt-8 pb-4 border-b border-border/50 flex flex-row items-center justify-between">
-                        <CardTitle className="text-xl font-semibold">Personal Info</CardTitle>
+                        <CardTitle className="text-xl font-semibold">Informasi Pribadi</CardTitle>
                         {!isEditing && (
                             <Button
                                 onClick={() => setIsEditing(true)}
@@ -229,7 +229,7 @@ export default function ProfilePage() {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="fullName" className="font-medium text-foreground flex items-center gap-2 text-sm">
-                                <User className="w-4 h-4 text-muted-foreground" /> Full Name
+                                <User className="w-4 h-4 text-muted-foreground" /> Nama Lengkap
                                 </Label>
                                 <Input
                                 id="fullName"
@@ -242,21 +242,21 @@ export default function ProfilePage() {
 
                             <div className="space-y-2">
                                 <Label htmlFor="businessName" className="font-medium text-foreground flex items-center gap-2 text-sm">
-                                <Store className="w-4 h-4 text-muted-foreground" /> Business Name
+                                <Store className="w-4 h-4 text-muted-foreground" /> Nama Bisnis
                                 </Label>
                                 <Input
                                 id="businessName"
                                 value={formData.businessName}
                                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                                 disabled={!isEditing}
-                                placeholder="e.g. Warung Sejahtera"
+                                placeholder="cth. Warung Sejahtera"
                                 className="h-12 rounded-xl font-medium disabled:bg-muted disabled:border-muted-foreground/20 disabled:text-muted-foreground"
                                 />
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="email" className="font-medium text-foreground flex items-center gap-2 text-sm">
-                                <Mail className="w-4 h-4 text-muted-foreground" /> Email Address
+                                <Mail className="w-4 h-4 text-muted-foreground" /> Alamat Email
                                 </Label>
                                 <Input
                                 id="email"
@@ -273,14 +273,14 @@ export default function ProfilePage() {
                                     onClick={handleSave}
                                     className="flex-1 h-12 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-all duration-base ease-in-out"
                                 >
-                                    <Save className="w-4 h-4 mr-2" /> Save Changes
+                                    <Save className="w-4 h-4 mr-2" /> Simpan Perubahan
                                 </Button>
                                 <Button
                                     onClick={handleCancel}
                                     variant="outline"
                                     className="flex-1 h-12 rounded-full border-border text-foreground hover:bg-muted hover:text-foreground font-medium transition-all duration-base ease-in-out"
                                 >
-                                    <X className="w-4 h-4 mr-2" /> Cancel
+                                    <X className="w-4 h-4 mr-2" /> Batal
                                 </Button>
                                 </div>
                             )}
@@ -291,15 +291,15 @@ export default function ProfilePage() {
                 {/* Data Management */}
                 <Card className="border-border shadow-sm rounded-2xl bg-white overflow-hidden">
                     <CardHeader className="px-8 pt-8 pb-4 bg-muted/50 border-b border-border/50">
-                        <CardTitle className="text-lg font-semibold">Data Management</CardTitle>
+                        <CardTitle className="text-lg font-semibold">Manajemen Data</CardTitle>
                     </CardHeader>
                     <CardContent className="p-8 space-y-4">
                         {/* Backup */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-5 border border-border rounded-2xl hover:bg-muted/30 transition-all duration-base ease-in-out group bg-white">
                             <div className="space-y-1">
-                                <p className="font-semibold text-foreground flex items-center gap-2"><Download className="w-5 h-5 text-primary" /> Backup Data</p>
+                                <p className="font-semibold text-foreground flex items-center gap-2"><Download className="w-5 h-5 text-primary" /> Cadangkan Data</p>
                                 <p className="text-xs text-muted-foreground max-w-xs">
-                                    Download a JSON copy of all your financial data.
+                                    Unduh salinan JSON dari semua data keuangan Anda.
                                 </p>
                             </div>
                             <Button
@@ -308,16 +308,16 @@ export default function ProfilePage() {
                                 variant="outline"
                                 className="h-10 px-6 rounded-full border-border text-foreground font-medium hover:bg-muted hover:text-foreground transition-all duration-base ease-in-out shrink-0"
                             >
-                                {backupMutation.isPending ? 'Exporting...' : 'Export'}
+                                {backupMutation.isPending ? 'Mengekspor...' : 'Ekspor'}
                             </Button>
                         </div>
 
                         {/* Import */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-5 bg-destructive/5 border border-destructive/20 rounded-2xl">
                              <div className="space-y-1">
-                                <p className="font-semibold text-destructive flex items-center gap-2"><Upload className="w-5 h-5" /> Restore Data</p>
+                                <p className="font-semibold text-destructive flex items-center gap-2"><Upload className="w-5 h-5" /> Pulihkan Data</p>
                                 <p className="text-xs text-destructive/80 flex items-center gap-1">
-                                    <AlertTriangle className="w-3 h-3" /> Warning: Overwrites existing data.
+                                    <AlertTriangle className="w-3 h-3" /> Peringatan: Menimpa data yang ada.
                                 </p>
                             </div>
                             <label htmlFor="file-upload" className="cursor-pointer shrink-0">
@@ -325,7 +325,7 @@ export default function ProfilePage() {
                                     {isImportLoading ? (
                                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                     ) : (
-                                        "Import File"
+                                        "Impor File"
                                     )}
                                 </div>
                                 <Input

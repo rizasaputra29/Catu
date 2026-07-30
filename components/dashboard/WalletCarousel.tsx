@@ -60,7 +60,7 @@ export function WalletCarousel({ wallets }: WalletCarouselProps) {
               <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center group-hover:bg-white transition-all duration-base ease-in-out">
                   <Plus className="w-7 h-7 text-muted-foreground group-hover:text-primary" />
               </div>
-              <span className="font-medium text-muted-foreground group-hover:text-foreground text-lg">Add New Wallet</span>
+              <span className="font-medium text-muted-foreground group-hover:text-foreground text-lg">Tambah Dompet Baru</span>
             </Button>
           </CarouselItem>
 
@@ -77,7 +77,7 @@ export function WalletCarousel({ wallets }: WalletCarouselProps) {
                           {WalletIconMap[wallet.type] || <WalletIcon className="w-6 h-6 text-primary" />}
                       </div>
                       <span className="text-xs font-semibold uppercase tracking-wider bg-primary text-white px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-base ease-in-out">
-                          Manage
+                          Kelola
                       </span>
                   </div>
 

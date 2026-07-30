@@ -184,7 +184,7 @@ export async function deleteOpeningBalance(year: number, month: number): Promise
 export async function importData(file: File): Promise<{ message: string }> {
   return new Promise((resolve, reject) => {
     if (file.type !== 'application/json') {
-      reject(new Error('Invalid file type. Please upload a JSON file.'));
+      reject(new Error('Tipe file tidak valid. Harap unggah file JSON.'));
       return;
     }
     const reader = new FileReader();
@@ -200,14 +200,14 @@ export async function importData(file: File): Promise<{ message: string }> {
         if (response.ok) {
           resolve(await response.json());
         } else {
-          const error = await response.json().catch(() => ({ message: 'Import failed' }));
+          const error = await response.json().catch(() => ({ message: 'Impor gagal' }));
           reject(new Error(error.message));
         }
       } catch (e) {
-        reject(new Error('Failed to parse or process the backup file.'));
+        reject(new Error('Gagal memproses file cadangan.'));
       }
     };
-    reader.onerror = () => reject(new Error('Error reading file.'));
+    reader.onerror = () => reject(new Error('Kesalahan membaca file.'));
     reader.readAsText(file);
   });
 }

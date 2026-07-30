@@ -33,14 +33,14 @@ export function DataTablePagination<TData>({
     <div className="flex flex-col items-center justify-between gap-4 px-2 py-4 sm:flex-row">
       <div className="text-muted-foreground text-sm">
         {totalItems !== undefined ? (
-          <>Showing <strong>{from}</strong> - <strong>{to}</strong> of <strong>{totalItems}</strong></>
+          <>Menampilkan <strong>{from}</strong> - <strong>{to}</strong> dari <strong>{totalItems}</strong></>
         ) : (
-          <>{table.getFilteredRowModel().rows.length} row(s)</>
+          <>{table.getFilteredRowModel().rows.length} baris</>
         )}
       </div>
       <div className="flex items-center gap-6 lg:gap-8">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Rows per page</span>
+          <span className="text-sm font-medium">Baris per halaman</span>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -66,7 +66,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
-            <span className="sr-only">Go to first page</span>
+            <span className="sr-only">Ke halaman pertama</span>
             <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
@@ -75,7 +75,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <span className="sr-only">Go to previous page</span>
+            <span className="sr-only">Ke halaman sebelumnya</span>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
@@ -84,7 +84,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <span className="sr-only">Go to next page</span>
+            <span className="sr-only">Ke halaman berikutnya</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
@@ -93,7 +93,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
-            <span className="sr-only">Go to last page</span>
+            <span className="sr-only">Ke halaman terakhir</span>
             <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>

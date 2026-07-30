@@ -20,7 +20,7 @@ export function AnnualRecapCard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
-            <h3 className="font-semibold text-lg">{year} Recap</h3>
+            <h3 className="font-semibold text-lg">Rekapitulasi {year}</h3>
           </div>
           <Link href="/annual-recap">
             <Button variant="ghost" size="sm" className="rounded-full font-medium hover:bg-muted transition-all duration-base ease-in-out">
@@ -28,34 +28,34 @@ export function AnnualRecapCard() {
             </Button>
           </Link>
         </div>
-        <p className="text-xs text-muted-foreground font-medium">Yearly cash book totals</p>
+        <p className="text-xs text-muted-foreground font-medium">Total buku kas tahunan</p>
       </CardHeader>
       <CardContent className="flex-1">
         {isLoading || !totals ? (
-          <div className="h-32 flex items-center justify-center text-sm text-muted-foreground">Loading...</div>
+          <div className="h-32 flex items-center justify-center text-sm text-muted-foreground">Memuat...</div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-primary/5 border border-border rounded-xl p-3">
               <div className="flex items-center gap-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider mb-1">
-                <Wallet className="w-3 h-3" /> Start Bal
+                <Wallet className="w-3 h-3" /> Saldo Awal
               </div>
               <p className="text-lg font-semibold text-foreground">{formatRupiah(totals.openingBalance)}</p>
             </div>
             <div className="bg-white border border-border rounded-xl p-3">
               <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                <TrendingUp className="w-3 h-3 text-emerald-600" /> Income
+                <TrendingUp className="w-3 h-3 text-emerald-600" /> Pemasukan
               </div>
               <p className="text-lg font-semibold text-foreground">{formatRupiah(totals.income)}</p>
             </div>
             <div className="bg-white border border-border rounded-xl p-3">
               <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                <TrendingDown className="w-3 h-3 text-slate-500" /> Expense
+                <TrendingDown className="w-3 h-3 text-destructive" /> Pengeluaran
               </div>
               <p className="text-lg font-semibold text-foreground">{formatRupiah(totals.expense)}</p>
             </div>
             <div className={`border border-border rounded-xl p-3 ${totals.profitLoss >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-destructive/10 text-destructive'}`}>
               <div className={`flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider mb-1 ${totals.profitLoss >= 0 ? 'text-emerald-600' : 'text-destructive'}`}>
-                Profit / Loss
+                Laba / Rugi
               </div>
               <p className="text-lg font-semibold">{formatRupiah(totals.profitLoss)}</p>
             </div>

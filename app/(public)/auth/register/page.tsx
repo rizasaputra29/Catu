@@ -12,6 +12,12 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 
+const BRAND = {
+  blue: '#3B6CB8',
+  darkBlue: '#2A5A9E',
+  lime: '#D4EC4A',
+} as const;
+
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,10 +36,10 @@ export default function RegisterPage() {
     const success = await register(email, password, fullName, securityAnswer);
 
     if (success) {
-      toast({ title: 'Registration successful', description: 'Account created! Redirecting...' });
+      toast({ title: 'Pendaftaran berhasil', description: 'Akun berhasil dibuat! Mengalihkan...' });
       router.push('/dashboard');
     } else {
-      toast({ title: 'Registration failed', description: 'Email already exists', variant: 'destructive' });
+      toast({ title: 'Pendaftaran gagal', description: 'Email sudah terdaftar', variant: 'destructive' });
     }
     setIsLoading(false);
   };
@@ -49,7 +55,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4 lg:p-8 font-sans selection:bg-primary selection:text-white">
+    <div
+      className="min-h-screen flex items-center justify-center bg-white p-4 lg:p-8 font-sans selection:bg-[var(--brand-blue)] selection:text-white"
+      style={{ '--brand-blue': BRAND.blue, '--brand-dark-blue': BRAND.darkBlue, '--brand-lime': BRAND.lime } as React.CSSProperties}
+    >
       <div className="w-full max-w-5xl grid lg:grid-cols-2 border border-border bg-white rounded-2xl overflow-hidden shadow-lg lg:h-[700px]">
         
         {/* LEFT SIDE: REGISTER FORM */}
@@ -78,21 +87,21 @@ export default function RegisterPage() {
 
           <div className="max-w-sm mx-auto w-full relative z-10">
             <div className="text-center lg:text-left mb-6">
-              <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-2">Create Account</h1>
-              <p className="text-muted-foreground font-normal">Start tracking your finances today</p>
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-2">Buat Akun</h1>
+              <p className="text-muted-foreground font-normal">Mulai lacak keuangan Anda hari ini</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">Nama Lengkap</Label>
                 <Input
                   id="fullName"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Nama Lengkap"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  className="h-11"
+                  className="h-11 focus-visible:ring-[var(--brand-blue)]"
                 />
               </div>
               <div className="space-y-2">
@@ -104,11 +113,11 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11"
+                  className="h-11 focus-visible:ring-[var(--brand-blue)]"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Kata Sandi</Label>
                 <Input
                   id="password"
                   type="password"
@@ -117,36 +126,36 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="h-11"
+                  className="h-11 focus-visible:ring-[var(--brand-blue)]"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="securityAnswer">Security: Mother&apos;s Maiden Name</Label>
+                <Label htmlFor="securityAnswer">Pertanyaan Keamanan: Nama Ibu Kandung</Label>
                 <Input
                   id="securityAnswer"
                   type="text"
-                  placeholder="For password recovery"
+                  placeholder="Untuk pemulihan kata sandi"
                   value={securityAnswer}
                   onChange={(e) => setSecurityAnswer(e.target.value)}
                   required
-                  className="h-11"
+                  className="h-11 focus-visible:ring-[var(--brand-blue)]"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-14 mt-4 text-lg font-medium rounded-pill bg-primary text-white hover:bg-primary/90 transition-all duration-base ease-in-out"
+                className="w-full h-14 mt-4 text-lg font-medium rounded-pill bg-[var(--brand-lime)] text-[var(--brand-dark-blue)] hover:bg-[var(--brand-lime)]/90 transition-all duration-base ease-in-out"
               >
-                {isLoading ? <Loader2 className="animate-spin" /> : 'Sign Up'}
+                {isLoading ? <Loader2 className="animate-spin" /> : 'Daftar'}
               </Button>
             </form>
 
             <div className="mt-8 text-center">
               <p className="text-muted-foreground font-normal">
-                Already have an account?{' '}
-                <Link href="/auth/login" className="font-medium text-primary hover:underline underline-offset-4 inline-flex items-center gap-1">
-                  Login
+                Sudah punya akun?{' '}
+                <Link href="/auth/login" className="font-medium text-[var(--brand-blue)] hover:text-[var(--brand-dark-blue)] hover:underline underline-offset-4 inline-flex items-center gap-1">
+                  Masuk
                 </Link>
               </p>
             </div>
@@ -155,7 +164,7 @@ export default function RegisterPage() {
 
         {/* RIGHT SIDE: DARK VISUAL PANEL */}
         <motion.div 
-          className="relative hidden lg:flex flex-col justify-between bg-primary text-white p-12 border-l border-border h-full order-1 lg:order-2"
+          className="relative hidden lg:flex flex-col justify-between bg-[var(--brand-dark-blue)] text-white p-12 border-l border-border h-full order-1 lg:order-2"
           variants={slideVariant}
           initial="initial"
           animate="animate"
@@ -172,10 +181,10 @@ export default function RegisterPage() {
                 <BrandLogo href="/" size="md" theme="dark" />
               </div>
              <div className="mt-12">
-                <h2 className="text-4xl font-semibold tracking-tight mb-4">Join the Club</h2>
-                <p className="text-base font-normal opacity-90 ml-auto max-w-xs leading-relaxed">
-                  Take control of your financial future with the smartest tracking tool.
-                </p>
+                <h2 className="text-4xl font-semibold tracking-tight mb-4">Bergabung Bersama Kami</h2>
+                 <p className="text-base font-normal opacity-90 ml-auto max-w-xs leading-relaxed">
+                    Kendalikan <span className="text-[var(--brand-lime)]">masa depan finansial</span> Anda dengan alat pelacak terpintar.
+                 </p>
              </div>
           </div>
         </motion.div>

@@ -42,7 +42,7 @@ export function InstallPrompt() {
     
     if (outcome === 'accepted') {
       setDeferredPrompt(null);
-      toast({ title: 'Success', description: 'Installing application...' });
+      toast({ title: 'Berhasil', description: 'Menginstal aplikasi...' });
     }
   };
 
@@ -56,7 +56,7 @@ export function InstallPrompt() {
         variant="outline" 
         className="h-9 rounded-pill border border-border text-foreground font-normal hover:bg-muted hover:text-foreground transition-all duration-base ease-in-out gap-2"
       >
-        <Download className="w-4 h-4" /> Install App
+        <Download className="w-4 h-4" /> Instal Aplikasi
       </Button>
     );
   }

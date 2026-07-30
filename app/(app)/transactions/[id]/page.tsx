@@ -37,8 +37,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { Transaction } from '@/lib/types';
 
-const incomeCategories = ['Sales', 'Service', 'Other Income'];
-const expenseCategories = ['Inventory', 'Rent', 'Utilities', 'Salaries', 'Transportation', 'Marketing', 'Equipment', 'Maintenance', 'Other Expense'];
+const incomeCategories = ['Penjualan', 'Jasa', 'Pendapatan Lain'];
+const expenseCategories = ['Persediaan', 'Sewa', 'Utilitas', 'Gaji', 'Transportasi', 'Pemasaran', 'Peralatan', 'Pemeliharaan', 'Pengeluaran Lain'];
 
 type TransactionForm = Omit<Transaction, 'id' | 'userId' | 'createdAt' | 'wallet' | 'description'> & {
   description: string;
@@ -80,7 +80,7 @@ export default function TransactionDetailPage() {
 
   useEffect(() => {
     if (!isLoadingTransaction && !transaction && isInitialized === false && id) {
-      toast({ title: 'Error', description: 'Transaction not found', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Transaksi tidak ditemukan', variant: 'destructive' });
       router.push('/transactions');
     }
   }, [isLoadingTransaction, transaction, isInitialized, id, router, toast]);
@@ -92,26 +92,26 @@ export default function TransactionDetailPage() {
 
   const handleSaveTransaction = async () => {
     if (!transactionForm.amount || !transactionForm.category || !transactionForm.walletId) {
-      toast({ title: 'Error', description: 'Please fill all required fields', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Harap isi semua kolom wajib', variant: 'destructive' });
       return;
     }
 
     try {
       await updateTransaction.mutateAsync({ ...transactionForm, id });
-      toast({ title: 'Success', description: 'Transaction updated successfully' });
+      toast({ title: 'Berhasil', description: 'Transaksi berhasil diperbarui' });
       router.push('/transactions');
     } catch (e) {
-      toast({ title: 'Error', description: 'Failed to update transaction.', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Gagal memperbarui transaksi.', variant: 'destructive' });
     }
   };
 
   const handleDelete = async () => {
     try {
       await deleteTransaction.mutateAsync(id);
-      toast({ title: 'Success', description: 'Transaction deleted' });
+      toast({ title: 'Berhasil', description: 'Transaksi berhasil dihapus' });
       router.push('/transactions');
     } catch (e) {
-      toast({ title: 'Error', description: 'Failed to delete transaction.', variant: 'destructive' });
+      toast({ title: 'Gagal', description: 'Gagal menghapus transaksi.', variant: 'destructive' });
     }
   };
 
@@ -128,26 +128,26 @@ export default function TransactionDetailPage() {
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <Link href="/transactions" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-base ease-in-out">
-            <ArrowLeft className="w-4 h-4" /> Back to Transactions
+            <ArrowLeft className="w-4 h-4" /> Kembali ke Transaksi
           </Link>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground mt-4">Edit Transaction</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground mt-4">Ubah Transaksi</h1>
         </div>
 
         <Card className="border border-border rounded-2xl overflow-hidden bg-white shadow-sm">
           <CardHeader className="px-8 pt-8 pb-2">
-            <CardTitle className="text-lg font-semibold">Details</CardTitle>
-            <CardDescription>Modify transaction information.</CardDescription>
+            <CardTitle className="text-lg font-semibold">Detail</CardTitle>
+            <CardDescription>Ubah informasi transaksi.</CardDescription>
           </CardHeader>
           <CardContent className="p-8 pt-4">
             <Tabs value={transactionForm.type} onValueChange={(value) => setTransactionForm({ ...transactionForm, type: value as 'income' | 'expense' })}>
               <TabsList className="grid w-full grid-cols-2 border border-border rounded-xl p-1 h-auto bg-muted mb-6">
-                <TabsTrigger value="expense" disabled className="rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm py-2 disabled:opacity-50 transition-all duration-base ease-in-out">Expense</TabsTrigger>
-                <TabsTrigger value="income" disabled className="rounded-lg font-medium data-[state=active]:bg-emerald-100 data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm py-2 disabled:opacity-50 transition-all duration-base ease-in-out">Income</TabsTrigger>
+                <TabsTrigger value="expense" disabled className="rounded-lg font-medium data-[state=active]:bg-destructive data-[state=active]:text-white transition-all duration-base ease-in-out py-2 disabled:opacity-50">Pengeluaran</TabsTrigger>
+                <TabsTrigger value="income" disabled className="rounded-lg font-medium data-[state=active]:bg-emerald-500 data-[state=active]:text-white transition-all duration-base ease-in-out py-2 disabled:opacity-50">Pemasukan</TabsTrigger>
               </TabsList>
 
               <div className="space-y-5">
                 <div className="space-y-2">
-                  <Label className="font-medium text-foreground">Amount</Label>
+                  <Label className="font-medium text-foreground">Jumlah</Label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-lg">Rp</span>
                     <Input
@@ -161,10 +161,10 @@ export default function TransactionDetailPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <Label className="font-medium text-foreground flex items-center gap-2"><Tag className="w-4 h-4" /> Category</Label>
+                    <Label className="font-medium text-foreground flex items-center gap-2"><Tag className="w-4 h-4" /> Kategori</Label>
                     <Select value={transactionForm.category} onValueChange={(v) => setTransactionForm({ ...transactionForm, category: v })}>
                       <SelectTrigger className="h-12 rounded-xl font-medium">
-                        <SelectValue placeholder="Select category" />
+                        <SelectValue placeholder="Pilih kategori" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
                         {(transactionForm.type === 'expense' ? expenseCategories : incomeCategories).map((cat) => (
@@ -174,15 +174,15 @@ export default function TransactionDetailPage() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-medium text-foreground flex items-center gap-2"><Calendar className="w-4 h-4" /> Date</Label>
+                    <Label className="font-medium text-foreground flex items-center gap-2"><Calendar className="w-4 h-4" /> Tanggal</Label>
                     <Input type="date" value={transactionForm.date} onChange={(e) => setTransactionForm({...transactionForm, date: e.target.value})} className="h-12 rounded-xl font-medium" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="font-medium text-foreground flex items-center gap-2"><FileText className="w-4 h-4" /> Description</Label>
+                  <Label className="font-medium text-foreground flex items-center gap-2"><FileText className="w-4 h-4" /> Keterangan</Label>
                   <Textarea
-                    placeholder="Add notes..."
+                    placeholder="Tambahkan catatan..."
                     value={transactionForm.description}
                     onChange={(e) => setTransactionForm({...transactionForm, description: e.target.value})}
                     className="rounded-xl min-h-[100px] resize-none p-4"
@@ -195,24 +195,24 @@ export default function TransactionDetailPage() {
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="outline" className="w-full sm:w-auto h-12 rounded-pill border border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive font-medium transition-all duration-base ease-in-out">
-                    <Trash2 className="w-5 h-5 mr-2" /> Delete
+                    <Trash2 className="w-5 h-5 mr-2" /> Hapus
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className="border border-border rounded-2xl">
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-xl font-semibold">Are you sure?</AlertDialogTitle>
+                    <AlertDialogTitle className="text-xl font-semibold">Apakah Anda yakin?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This transaction will be permanently deleted.
+                      Tindakan ini tidak dapat dibatalkan. Transaksi ini akan dihapus secara permanen.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="rounded-pill font-medium border border-border">Cancel</AlertDialogCancel>
+                    <AlertDialogCancel className="rounded-pill font-medium border border-border">Batal</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDelete}
                       disabled={deleteTransaction.isPending}
                       className="rounded-pill font-medium bg-destructive text-white hover:bg-destructive/90 border-0"
                     >
-                      Delete Transaction
+                      Hapus Transaksi
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -223,7 +223,7 @@ export default function TransactionDetailPage() {
                 disabled={updateTransaction.isPending}
                 className="flex-1 h-12 rounded-pill bg-primary text-white font-medium text-lg hover:bg-primary/90 transition-all duration-base ease-in-out"
               >
-                <Save className="w-5 h-5 mr-2" /> {updateTransaction.isPending ? 'Saving...' : 'Save Changes'}
+                <Save className="w-5 h-5 mr-2" /> {updateTransaction.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
               </Button>
             </div>
           </CardContent>

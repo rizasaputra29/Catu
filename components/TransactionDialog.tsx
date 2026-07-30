@@ -20,8 +20,8 @@ interface TransactionDialogProps {
   initialData?: Transaction | null;
 }
 
-const incomeCategories = ['Sales', 'Service', 'Other Income'];
-const expenseCategories = ['Inventory', 'Rent', 'Utilities', 'Salaries', 'Transportation', 'Marketing', 'Equipment', 'Maintenance', 'Other Expense'];
+const incomeCategories = ['Penjualan', 'Jasa', 'Pendapatan Lain'];
+const expenseCategories = ['Persediaan', 'Sewa', 'Utilitas', 'Gaji', 'Transportasi', 'Pemasaran', 'Peralatan', 'Pemeliharaan', 'Pengeluaran Lain'];
 
 export function TransactionDialog({ open, onOpenChange, onSave, wallets, initialData }: TransactionDialogProps) {
   const [type, setType] = useState<'income' | 'expense'>('expense');
@@ -80,7 +80,7 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
       <DialogContent className="border border-border rounded-2xl sm:max-w-md p-0 overflow-hidden bg-white gap-0 shadow-lg">
          <DialogHeader className="p-6 pb-4 border-b border-border">
           <DialogTitle className="text-2xl font-bold">
-            {initialData ? 'Edit Transaction' : 'New Transaction'}
+            {initialData ? 'Ubah Transaksi' : 'Transaksi Baru'}
           </DialogTitle>
         </DialogHeader>
 
@@ -90,23 +90,23 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
                <TabsTrigger
                     value="expense"
                     disabled={!!initialData}
-                    className="rounded-lg font-semibold data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all duration-base ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-lg font-semibold data-[state=active]:bg-destructive data-[state=active]:text-white transition-all duration-base ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                >
-                  <ArrowDownRight className="w-4 h-4 mr-2" /> Expense
+                  <ArrowDownRight className="w-4 h-4 mr-2" /> Pengeluaran
                </TabsTrigger>
                <TabsTrigger
                     value="income"
                     disabled={!!initialData}
                     className="rounded-lg font-semibold data-[state=active]:bg-emerald-500 data-[state=active]:text-white transition-all duration-base ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                >
-                  <ArrowUpRight className="w-4 h-4 mr-2" /> Income
+                  <ArrowUpRight className="w-4 h-4 mr-2" /> Pemasukan
                </TabsTrigger>
             </TabsList>
           </Tabs>
 
            {/* Amount Input */}
            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Amount</Label>
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Jumlah</Label>
               <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-muted-foreground">Rp</span>
                   <Input
@@ -121,12 +121,12 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
            {/* Details Grid */}
            <div className="grid grid-cols-2 gap-4">
                <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Wallet</Label>
+                   <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Dompet</Label>
                   <Select value={walletId} onValueChange={setWalletId}>
                       <SelectTrigger className="h-12 rounded-xl font-bold transition-all duration-base ease-in-out">
                          <div className="flex items-center gap-2 overflow-hidden">
                              <WalletIcon className="w-4 h-4 text-muted-foreground shrink-0" />
-                             <span className="truncate">{wallets.find(w => w.id === walletId)?.name || "Select"}</span>
+                              <span className="truncate">{wallets.find(w => w.id === walletId)?.name || "Pilih Dompet"}</span>
                          </div>
                       </SelectTrigger>
                       <SelectContent>
@@ -139,7 +139,7 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
                   </Select>
                </div>
                <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Date</Label>
+                   <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tanggal</Label>
                   <div className="relative">
                       <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-12 rounded-xl font-bold pl-10" />
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -148,12 +148,12 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
            </div>
 
            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Category</Label>
+               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Kategori</Label>
               <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger className="h-12 rounded-xl font-bold transition-all duration-base ease-in-out">
                       <div className="flex items-center gap-2">
                          <Tag className="w-4 h-4 text-muted-foreground" />
-                         <SelectValue placeholder="Select Category" />
+                          <SelectValue placeholder="Pilih Kategori" />
                       </div>
                   </SelectTrigger>
                   <SelectContent>
@@ -165,9 +165,9 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
            </div>
 
            <div className="space-y-2">
-               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Note (Optional)</Label>
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Catatan (Opsional)</Label>
                <Textarea
-                  placeholder="Add details..."
+                   placeholder="Tambahkan keterangan..."
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
                   className="rounded-xl resize-none font-medium min-h-[80px]"
@@ -179,7 +179,7 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
              disabled={!amount || !walletId || !category || isSubmitting}
              className="w-full h-14 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary/90 transition-all duration-base ease-in-out disabled:opacity-50"
            >
-             {isSubmitting ? 'Saving...' : (initialData ? 'Update Transaction' : 'Save Transaction')}
+             {isSubmitting ? 'Menyimpan...' : (initialData ? 'Simpan Perubahan' : 'Simpan Transaksi')}
            </Button>
         </div>
       </DialogContent>

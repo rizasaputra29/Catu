@@ -5,29 +5,29 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 10%;
+    --foreground: 220 20% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
+    --card-foreground: 220 20% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
-    --primary: 240 100% 46.7%;
+    --popover-foreground: 220 20% 10%;
+    --primary: 216 51% 48%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 10% 10%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 124 100% 44%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 84% 60%;
+    --secondary: 216 30% 96%;
+    --secondary-foreground: 220 20% 10%;
+    --muted: 216 20% 96%;
+    --muted-foreground: 220 10% 46%;
+    --accent: 69 81% 61%;
+    --accent-foreground: 215 58% 39%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 240 100% 46.7%;
-    --chart-1: 240 100% 46.7%;
-    --chart-2: 124 100% 44%;
-    --chart-3: 240 4% 46%;
-    --chart-4: 0 0% 0%;
-    --chart-5: 0 0% 100%;
+    --border: 216 20% 90%;
+    --input: 216 20% 90%;
+    --ring: 216 51% 48%;
+    --chart-1: 160 84% 39%;
+    --chart-2: 0 72% 51%;
+    --chart-3: 216 51% 48%;
+    --chart-4: 215 58% 39%;
+    --chart-5: 69 81% 61%;
     --radius: 16px;
   }
 }
@@ -40,6 +40,7 @@
   html {
     @apply bg-white text-foreground;
     font-family: var(--font-onest), system-ui, sans-serif;
+    scroll-behavior: smooth;
   }
 
   body {

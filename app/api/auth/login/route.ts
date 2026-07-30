@@ -10,12 +10,12 @@ export async function POST(request: Request) {
     // FIX CALLABILITY: Menggunakan destructuring yang sederhana
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+      return NextResponse.json({ message: 'Kredensial tidak valid' }, { status: 401 });
     }
 
     const passwordValid = await comparePassword(password, user.password);
     if (!passwordValid) {
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+      return NextResponse.json({ message: 'Kredensial tidak valid' }, { status: 401 });
     }
 
     const userWithoutPassword: ClientUser = { 
@@ -29,6 +29,6 @@ export async function POST(request: Request) {
     return NextResponse.json(userWithoutPassword);
   } catch (error) {
     console.error('Login API error:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
   }
 }

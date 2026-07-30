@@ -21,10 +21,10 @@ export function RecentTransactionsCard({ transactions, wallets }: RecentTransact
           <div className="p-2 bg-primary/10 text-primary rounded-full">
              <TrendingUp className="w-4 h-4" />
           </div>
-          <CardTitle className="text-lg font-semibold">Recent</CardTitle>
+          <CardTitle className="text-lg font-semibold">Terbaru</CardTitle>
         </div>
         <Link href="/transactions" className="text-xs font-medium bg-muted px-3 py-1 rounded-full hover:bg-muted/80 transition-all duration-base ease-in-out">
-          View All
+          Lihat Semua
         </Link>
       </CardHeader>
 
@@ -34,7 +34,7 @@ export function RecentTransactionsCard({ transactions, wallets }: RecentTransact
                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-3">
                    <CreditCard className="w-6 h-6 opacity-30" />
                </div>
-               <p className="text-sm font-medium">No transactions</p>
+                <p className="text-sm font-medium">Tidak ada transaksi</p>
            </div>
         ) : (
             <div className="divide-y divide-border">
@@ -43,7 +43,7 @@ export function RecentTransactionsCard({ transactions, wallets }: RecentTransact
                    return (
                      <div key={t.id} className="px-6 py-4 flex items-center justify-between hover:bg-muted/50 transition-all duration-base ease-in-out group">
                         <div className="flex items-center gap-3 overflow-hidden">
-                            <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-foreground'}`}>
+                            <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-destructive/10 text-destructive'}`}>
                                 {t.type === 'income' ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
                             </div>
                             <div className="min-w-0">
@@ -53,7 +53,7 @@ export function RecentTransactionsCard({ transactions, wallets }: RecentTransact
                                 </p>
                             </div>
                         </div>
-                        <span className={`font-semibold text-sm whitespace-nowrap ${t.type === 'income' ? 'text-emerald-600' : 'text-foreground'}`}>
+                        <span className={`font-semibold text-sm whitespace-nowrap ${t.type === 'income' ? 'text-emerald-600' : 'text-destructive'}`}>
                             {t.type === 'income' ? '+' : '-'} {formatRupiah(t.amount).replace('Rp', '')}
                         </span>
                      </div>

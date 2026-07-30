@@ -17,10 +17,10 @@ export default function NewWalletPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [form, setForm] = useState({ name: '', type: 'cash', balance: '', color: '#0000ee' });
+  const [form, setForm] = useState({ name: '', type: 'cash', balance: '', color: '#3B6CB8' });
 
   const handleSave = async () => {
-    if (!form.name) return toast({ title: "Error", description: "Name is required", variant: "destructive" });
+    if (!form.name) return toast({ title: "Gagal", description: "Nama wajib diisi", variant: "destructive" });
 
     try {
       await createWallet.mutateAsync({
@@ -29,10 +29,10 @@ export default function NewWalletPage() {
         balance: parseFloat(cleanRupiah(form.balance)) || 0,
         color: form.color,
       });
-      toast({ title: "Success", description: "Wallet created!" });
+      toast({ title: "Berhasil", description: "Dompet berhasil dibuat!" });
       router.push('/dashboard');
     } catch (e) {
-      toast({ title: "Error", description: "Failed to create.", variant: "destructive" });
+      toast({ title: "Gagal", description: "Gagal membuat dompet.", variant: "destructive" });
     }
   };
 
@@ -40,33 +40,33 @@ export default function NewWalletPage() {
     <div className="min-h-screen bg-white pb-24 font-sans">
       <div className="container mx-auto px-4 sm:px-6 py-8 max-w-xl">
         <Button variant="ghost" onClick={() => router.back()} className="mb-6 pl-0 hover:bg-transparent hover:text-black">
-          <ArrowLeft className="w-5 h-5 mr-2" /> Cancel
+          <ArrowLeft className="w-5 h-5 mr-2" /> Batal
         </Button>
 
         <Card className="border border-border rounded-2xl overflow-hidden bg-white shadow-sm">
           <CardHeader className="px-8 pt-8 pb-4 border-b border-border">
-            <CardTitle className="text-2xl font-semibold tracking-tight">New Wallet</CardTitle>
+            <CardTitle className="text-2xl font-semibold tracking-tight">Dompet Baru</CardTitle>
           </CardHeader>
           <CardContent className="p-8 space-y-6">
             <div className="space-y-2">
-              <Label className="font-bold">Wallet Name</Label>
-              <Input placeholder="e.g. Main Bank, Secret Stash" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="h-12" />
+              <Label className="font-bold">Nama Dompet</Label>
+              <Input placeholder="cth. Bank Utama, Tabungan" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="h-12" />
             </div>
 
             <div className="space-y-2">
-              <Label className="font-bold">Type</Label>
+              <Label className="font-bold">Jenis</Label>
               <Select value={form.type} onValueChange={(v) => setForm({...form, type: v})}>
                 <SelectTrigger className="h-12"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="bank">Bank Account</SelectItem>
-                  <SelectItem value="e-wallet">E-Wallet</SelectItem>
+                  <SelectItem value="cash">Tunai</SelectItem>
+                  <SelectItem value="bank">Rekening Bank</SelectItem>
+                  <SelectItem value="e-wallet">Dompet Digital</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label className="font-bold">Initial Balance</Label>
+              <Label className="font-bold">Saldo Awal</Label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">Rp</span>
                 <Input
@@ -79,9 +79,9 @@ export default function NewWalletPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="font-bold">Color Theme</Label>
+              <Label className="font-bold">Warna Tema</Label>
               <div className="flex gap-3">
-                {['#0000ee', '#3b82f6', '#6366f1', '#94a3b8', '#f1f5f9'].map(c => (
+                {['#3B6CB8', '#2A5A9E', '#D4EC4A', '#94a3b8', '#f1f5f9'].map(c => (
                   <div
                     key={c}
                     onClick={() => setForm({...form, color: c})}
@@ -97,7 +97,7 @@ export default function NewWalletPage() {
               disabled={createWallet.isPending}
               className="w-full rounded-pill bg-primary text-white font-bold h-14 text-lg mt-4 hover:bg-primary/90 transition-all duration-base ease-in-out"
             >
-              {createWallet.isPending ? 'Creating...' : 'Create Wallet'}
+              {createWallet.isPending ? 'Membuat...' : 'Buat Dompet'}
             </Button>
           </CardContent>
         </Card>

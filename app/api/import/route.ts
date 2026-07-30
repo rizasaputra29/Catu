@@ -9,14 +9,14 @@ export async function POST(request: Request) {
   const userId = getUserIdFromRequest(request);
 
   if (!userId) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
   }
 
   try {
     const backupData: any = await request.json();
 
     if (!backupData || backupData.user_id !== userId) {
-      return NextResponse.json({ message: 'Invalid or mismatched backup file' }, { status: 400 });
+      return NextResponse.json({ message: 'File cadangan tidak valid atau tidak cocok' }, { status: 400 });
     }
 
     await prisma.$transaction(async (tx) => {
@@ -85,10 +85,10 @@ export async function POST(request: Request) {
         }
     });
 
-    return NextResponse.json({ message: 'Data imported successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'Data berhasil diimpor' }, { status: 200 });
 
   } catch (error) {
     console.error('Import Error:', error);
-    return NextResponse.json({ message: 'Failed to import data' }, { status: 500 });
+    return NextResponse.json({ message: 'Gagal mengimpor data' }, { status: 500 });
   }
 }

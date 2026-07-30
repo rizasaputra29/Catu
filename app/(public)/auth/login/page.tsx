@@ -13,6 +13,12 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 
+const BRAND = {
+  blue: '#3B6CB8',
+  darkBlue: '#2A5A9E',
+  lime: '#D4EC4A',
+} as const;
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,10 +40,10 @@ export default function LoginPage() {
     setIsLoading(true);
     const success = await login(email, password);
     if (success) {
-      toast({ title: 'Login successful', description: 'Welcome back to CATU!' });
+      toast({ title: 'Berhasil masuk', description: 'Selamat datang kembali di CATU!' });
       router.push('/dashboard');
     } else {
-      toast({ title: 'Login failed', description: 'Invalid email or password', variant: 'destructive' });
+      toast({ title: 'Gagal masuk', description: 'Email atau kata sandi salah', variant: 'destructive' });
     }
     setIsLoading(false);
   };
@@ -45,16 +51,16 @@ export default function LoginPage() {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword.length < 6) {
-        toast({ title: 'Error', description: 'New password must be at least 6 characters long.', variant: 'destructive' });
+        toast({ title: 'Kesalahan', description: 'Kata sandi baru minimal 6 karakter.', variant: 'destructive' });
         return;
     }
     setIsSendingReset(true);
     const success = await forgotPassword(forgotEmail, forgotSecurityAnswer, newPassword);
     if (success) {
-      toast({ title: 'Success', description: 'Password reset successfully. Please login.' });
+      toast({ title: 'Berhasil', description: 'Reset kata sandi berhasil. Silakan masuk.' });
       setIsForgotOpen(false);
     } else {
-      toast({ title: 'Reset Failed', description: 'Verification failed. Check your details.', variant: 'destructive' });
+      toast({ title: 'Reset gagal', description: 'Verifikasi gagal. Periksa kembali data Anda.', variant: 'destructive' });
     }
     setIsSendingReset(false);
   };
@@ -70,12 +76,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4 lg:p-8 font-sans selection:bg-primary selection:text-white">
+    <div
+      className="min-h-screen flex items-center justify-center bg-white p-4 lg:p-8 font-sans selection:bg-[var(--brand-blue)] selection:text-white"
+      style={{ '--brand-blue': BRAND.blue, '--brand-dark-blue': BRAND.darkBlue, '--brand-lime': BRAND.lime } as React.CSSProperties}
+    >
       <div className="w-full max-w-5xl grid lg:grid-cols-2 border border-border bg-white rounded-2xl overflow-hidden shadow-lg lg:h-[700px]">
         
         {/* LEFT SIDE: DARK VISUAL PANEL */}
         <motion.div 
-          className="relative hidden lg:flex flex-col justify-between bg-primary text-white p-12 border-r border-border h-full z-20"
+          className="relative hidden lg:flex flex-col justify-between bg-[var(--brand-dark-blue)] text-white p-12 border-r border-border h-full z-20"
           variants={slideVariant}
           initial="initial"
           animate="animate"
@@ -90,10 +99,10 @@ export default function LoginPage() {
           <div className="relative z-10">
              <BrandLogo href="/" size="md" theme="dark" />
              <div className="mt-12">
-                <h2 className="text-4xl font-semibold tracking-tight mb-4">Welcome Back!</h2>
-                <p className="text-base font-normal opacity-90 max-w-xs leading-relaxed">
-                  Continue your journey to financial freedom. Your dashboard is waiting.
-                </p>
+                 <h2 className="text-4xl font-semibold tracking-tight mb-4">Selamat Datang Kembali!</h2>
+                 <p className="text-base font-normal opacity-90 max-w-xs leading-relaxed">
+                    Lanjutkan perjalanan menuju <span className="text-[var(--brand-lime)]">kebebasan finansial</span>. Dasbor Anda menunggu.
+                 </p>
              </div>
           </div>
         </motion.div>
@@ -124,8 +133,8 @@ export default function LoginPage() {
 
           <div className="max-w-sm mx-auto w-full relative z-10">
             <div className="text-center lg:text-left mb-8">
-              <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-2">Login</h1>
-              <p className="text-muted-foreground font-normal">Enter your details to access your account</p>
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-2">Masuk</h1>
+              <p className="text-muted-foreground font-normal">Masukkan detail Anda untuk mengakses akun</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -138,38 +147,38 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-12"
+                  className="h-12 focus-visible:ring-[var(--brand-blue)]"
                 />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">Kata Sandi</Label>
                     <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
                         <DialogTrigger asChild>
-                            <button type="button" className="text-xs font-medium text-primary hover:underline underline-offset-2">
-                                Forgot Password?
+                            <button type="button" className="text-xs font-medium text-[var(--brand-blue)] hover:text-[var(--brand-dark-blue)] hover:underline underline-offset-2">
+                                Lupa Kata Sandi?
                             </button>
                         </DialogTrigger>
                         <DialogContent className="border border-border rounded-2xl">
                             <DialogHeader>
-                                <DialogTitle className="text-2xl font-semibold tracking-tight">Reset Password</DialogTitle>
-                                <DialogDescription>Verify your identity to reset access.</DialogDescription>
+                                <DialogTitle className="text-2xl font-semibold tracking-tight">Reset Kata Sandi</DialogTitle>
+                                <DialogDescription>Verifikasi identitas Anda untuk mengatur ulang akses.</DialogDescription>
                             </DialogHeader>
                             <form onSubmit={handleForgotPassword} className="space-y-4 mt-4">
                                 <div className="space-y-2">
                                     <Label>Email</Label>
-                                    <Input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required className="h-12" />
+                                    <Input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required className="h-12 focus-visible:ring-[var(--brand-blue)]" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Mother&apos;s Maiden Name</Label>
-                                    <Input type="text" value={forgotSecurityAnswer} onChange={(e) => setForgotSecurityAnswer(e.target.value)} required className="h-12" />
+                                    <Label>Nama Ibu Kandung</Label>
+                                    <Input type="text" value={forgotSecurityAnswer} onChange={(e) => setForgotSecurityAnswer(e.target.value)} required className="h-12 focus-visible:ring-[var(--brand-blue)]" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>New Password</Label>
-                                    <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={6} className="h-12" />
+                                    <Label>Kata Sandi Baru</Label>
+                                    <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={6} className="h-12 focus-visible:ring-[var(--brand-blue)]" />
                                 </div>
-                                <Button type="submit" disabled={isSendingReset} className="w-full h-12 rounded-pill bg-primary text-white hover:bg-primary/90 transition-all duration-base ease-in-out">
-                                    {isSendingReset ? 'Resetting...' : 'Confirm Reset'}
+                                <Button type="submit" disabled={isSendingReset} className="w-full h-12 rounded-pill bg-[var(--brand-lime)] text-[var(--brand-dark-blue)] hover:bg-[var(--brand-lime)]/90 transition-all duration-base ease-in-out">
+                                    {isSendingReset ? 'Mereset...' : 'Konfirmasi Reset'}
                                 </Button>
                             </form>
                         </DialogContent>
@@ -182,24 +191,24 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-12"
+                  className="h-12 focus-visible:ring-[var(--brand-blue)]"
                 />
               </div>
               
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-14 text-lg font-medium rounded-pill bg-primary text-white hover:bg-primary/90 transition-all duration-base ease-in-out"
+                className="w-full h-14 text-lg font-medium rounded-pill bg-[var(--brand-lime)] text-[var(--brand-dark-blue)] hover:bg-[var(--brand-lime)]/90 transition-all duration-base ease-in-out"
               >
-                {isLoading ? <Loader2 className="animate-spin" /> : 'Sign In'}
+                {isLoading ? <Loader2 className="animate-spin" /> : 'Masuk'}
               </Button>
             </form>
 
             <div className="mt-8 text-center">
               <p className="text-muted-foreground font-normal">
-                Don&apos;t have an account?{' '}
-                <Link href="/auth/register" className="font-medium text-primary hover:underline underline-offset-4 inline-flex items-center gap-1">
-                  Register
+                Belum punya akun?{' '}
+                <Link href="/auth/register" className="font-medium text-[var(--brand-blue)] hover:text-[var(--brand-dark-blue)] hover:underline underline-offset-4 inline-flex items-center gap-1">
+                  Daftar
                 </Link>
               </p>
             </div>

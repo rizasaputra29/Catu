@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const userId = getUserIdFromRequest(request);
 
   if (!userId) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
   }
 
   try {
@@ -53,6 +53,6 @@ export async function GET(request: Request) {
 
   } catch (error) {
     console.error('Backup Error:', error);
-    return NextResponse.json({ message: 'Failed to create backup' }, { status: 500 });
+    return NextResponse.json({ message: 'Gagal membuat cadangan' }, { status: 500 });
   }
 }

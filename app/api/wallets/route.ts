@@ -8,7 +8,7 @@ import { getUserIdFromRequest } from '@/lib/auth';
 // GET: Fetch all wallets
 export async function GET(request: Request) {
   const userId = getUserIdFromRequest(request); 
-  if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
   try {
     const wallets = await prisma.wallet.findMany({
@@ -17,14 +17,14 @@ export async function GET(request: Request) {
     });
     return NextResponse.json(wallets);
   } catch (error) {
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
   }
 }
 
 // POST: Create a new wallet
 export async function POST(request: Request) {
   const userId = getUserIdFromRequest(request); 
-  if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
   try {
     const { name, type, balance, color } = await request.json();
@@ -41,14 +41,14 @@ export async function POST(request: Request) {
     
     return NextResponse.json(newWallet, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ message: 'Failed to create wallet' }, { status: 500 });
+    return NextResponse.json({ message: 'Gagal membuat dompet' }, { status: 500 });
   }
 }
 
 // PUT: Update wallet details
 export async function PUT(request: Request) {
     const userId = getUserIdFromRequest(request); 
-    if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
     try {
         const { id, name, type, balance, color } = await request.json();
@@ -67,20 +67,20 @@ export async function PUT(request: Request) {
 
         return NextResponse.json(updatedWallet);
     } catch (error) {
-        return NextResponse.json({ message: 'Failed to update wallet' }, { status: 500 });
+        return NextResponse.json({ message: 'Gagal memperbarui dompet' }, { status: 500 });
     }
 }
 
 // DELETE: Delete wallet
 export async function DELETE(request: Request) {
     const userId = getUserIdFromRequest(request); 
-    if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
-        if (!id) return NextResponse.json({ message: 'ID required' }, { status: 400 });
+        if (!id) return NextResponse.json({ message: 'ID wajib diisi' }, { status: 400 });
 
         // Delete wallet and cascade delete transactions (or handled by DB constraints)
         // Prisma schema doesn't have cascade on, so we delete manually inside transaction
@@ -93,8 +93,8 @@ export async function DELETE(request: Request) {
             });
         });
 
-        return NextResponse.json({ message: 'Wallet deleted' });
+        return NextResponse.json({ message: 'Dompet dihapus' });
     } catch (error) {
-        return NextResponse.json({ message: 'Failed to delete wallet' }, { status: 500 });
+        return NextResponse.json({ message: 'Gagal menghapus dompet' }, { status: 500 });
     }
 }

@@ -9,12 +9,12 @@ export async function POST(request: Request) {
     const { email, password, fullName, businessName, securityAnswer } = await request.json();
 
     if (!email || !password || !fullName || !securityAnswer) {
-      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json({ message: 'Data wajib belum lengkap' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } }); 
     if (user) {
-      return NextResponse.json({ message: 'Email already exists' }, { status: 409 });
+      return NextResponse.json({ message: 'Email sudah terdaftar' }, { status: 409 });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -38,6 +38,6 @@ export async function POST(request: Request) {
     return NextResponse.json(newUser as ClientUser, { status: 201 });
   } catch (error) {
     console.error('Registration API error:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
   }
 }

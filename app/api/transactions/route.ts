@@ -100,7 +100,7 @@ function buildOrderBy(
 // GET: Read paginated transactions
 export async function GET(request: Request) {
   const userId = getUserIdFromRequest(request);
-  if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
   try {
     const params = parseTransactionsQueryParams(request);
@@ -152,14 +152,14 @@ export async function GET(request: Request) {
     return NextResponse.json(response);
   } catch (error) {
     console.error('Error fetching transactions:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
   }
 }
 
 // POST: Create transaction
 export async function POST(request: Request) {
   const userId = getUserIdFromRequest(request);
-  if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
   try {
     const { type, amount, category, description, date, walletId } = await request.json();
@@ -192,14 +192,14 @@ export async function POST(request: Request) {
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     console.error('Error creating transaction:', error);
-    return NextResponse.json({ message: 'Failed to create transaction' }, { status: 500 });
+    return NextResponse.json({ message: 'Gagal membuat transaksi' }, { status: 500 });
   }
 }
 
 // PUT: Update transaction
 export async function PUT(request: Request) {
   const userId = getUserIdFromRequest(request);
-  if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
   try {
     const { id, type, amount, category, description, date, walletId } = await request.json();
@@ -207,7 +207,7 @@ export async function PUT(request: Request) {
 
     const result = await prisma.$transaction(async (tx) => {
       const oldTx = await tx.transaction.findUnique({ where: { id, userId } });
-      if (!oldTx) throw new Error('Transaction not found');
+      if (!oldTx) throw new Error('Transaksi tidak ditemukan');
 
       if (oldTx.walletId) {
         const revertAmount = oldTx.type === 'income' ? -oldTx.amount : oldTx.amount;
@@ -243,20 +243,20 @@ export async function PUT(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error updating transaction:', error);
-    return NextResponse.json({ message: 'Failed to update transaction' }, { status: 500 });
+    return NextResponse.json({ message: 'Gagal memperbarui transaksi' }, { status: 500 });
   }
 }
 
 // DELETE: Delete transaction
 export async function DELETE(request: Request) {
   const userId = getUserIdFromRequest(request);
-  if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
-    if (!id) return NextResponse.json({ message: 'Transaction ID required' }, { status: 400 });
+    if (!id) return NextResponse.json({ message: 'ID transaksi wajib diisi' }, { status: 400 });
 
     await prisma.$transaction(async (tx) => {
       const txToDelete = await tx.transaction.findUnique({ where: { id, userId } });
@@ -273,9 +273,9 @@ export async function DELETE(request: Request) {
       await tx.transaction.delete({ where: { id, userId } });
     });
 
-    return NextResponse.json({ message: 'Transaction deleted successfully' });
+    return NextResponse.json({ message: 'Transaksi berhasil dihapus' });
   } catch (error) {
     console.error('Error deleting transaction:', error);
-    return NextResponse.json({ message: 'Failed to delete transaction' }, { status: 500 });
+    return NextResponse.json({ message: 'Gagal menghapus transaksi' }, { status: 500 });
   }
 }

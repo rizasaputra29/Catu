@@ -17,7 +17,7 @@ export function getTransactionColumns(actions: TransactionColumnsActions): Colum
   return [
     {
       accessorKey: 'date',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Tanggal" />,
       cell: ({ row }) => {
         const date = new Date(row.getValue('date'));
         return (
@@ -30,7 +30,7 @@ export function getTransactionColumns(actions: TransactionColumnsActions): Colum
     },
     {
       accessorKey: 'category',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Category" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Kategori" />,
       cell: ({ row }) => (
         <span className="inline-flex items-center rounded-full border bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground">
           {row.getValue('category')}
@@ -40,7 +40,7 @@ export function getTransactionColumns(actions: TransactionColumnsActions): Colum
     },
     {
       accessorKey: 'description',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Note" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Catatan" />,
       cell: ({ row }) => (
         <div className="text-sm text-muted-foreground truncate max-w-[200px]">
           {row.getValue('description') || '-'}
@@ -50,14 +50,14 @@ export function getTransactionColumns(actions: TransactionColumnsActions): Colum
     },
     {
       id: 'wallet',
-      accessorFn: (row) => row.wallet?.name || 'Unknown Wallet',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Wallet" />,
+      accessorFn: (row) => row.wallet?.name || 'Dompet tidak dikenal',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Dompet" />,
       cell: ({ row }) => <div className="text-sm">{row.getValue('wallet')}</div>,
       size: 150,
     },
     {
       accessorKey: 'type',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Jenis" />,
       cell: ({ row }) => {
         const type = row.getValue('type') as 'income' | 'expense';
         return (
@@ -65,10 +65,10 @@ export function getTransactionColumns(actions: TransactionColumnsActions): Colum
             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
               type === 'income'
                 ? 'bg-emerald-100 text-emerald-700'
-                : 'bg-slate-100 text-slate-700'
+                : 'bg-destructive/10 text-destructive'
             }`}
           >
-            {type === 'income' ? 'Income' : 'Expense'}
+            {type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
           </span>
         );
       },
@@ -76,14 +76,14 @@ export function getTransactionColumns(actions: TransactionColumnsActions): Colum
     },
     {
       accessorKey: 'amount',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" align="right" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Jumlah" align="right" />,
       cell: ({ row }) => {
         const type = row.getValue('type') as 'income' | 'expense';
         const amount = Number(row.getValue('amount'));
         return (
           <div
             className={`text-right text-sm font-semibold ${
-              type === 'income' ? 'text-emerald-600' : 'text-foreground'
+              type === 'income' ? 'text-emerald-600' : 'text-destructive'
             }`}
           >
             {type === 'income' ? '+' : '-'} {formatRupiah(amount)}

@@ -10,9 +10,9 @@ import { LayoutDashboard, TrendingUp, LogOut, BarChart3 } from 'lucide-react';
 
 // --- Nav Items ---
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/transactions', label: 'Transactions', icon: TrendingUp },
-  { href: '/annual-recap', label: 'Recap', icon: BarChart3 },
+  { href: '/dashboard', label: 'Dasbor', icon: LayoutDashboard },
+  { href: '/transactions', label: 'Transaksi', icon: TrendingUp },
+  { href: '/annual-recap', label: 'Rekap', icon: BarChart3 },
 ];
 
 /**
@@ -89,7 +89,7 @@ function DesktopNav() {
               variant="ghost"
               size="icon"
               className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-all duration-base ease-in-out w-10 h-10"
-              title="Logout"
+              title="Keluar"
             >
               <LogOut className="w-5 h-5" />
             </Button>

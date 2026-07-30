@@ -63,7 +63,7 @@ export function BrandLogo({
         </span>
         {showSubtitle && (
           <span className={cn(sizeConfig.subtitle, themeConfig.subtitle)}>
-            Catatan Keuangan
+            Catatan Aplikasi Keuangan
           </span>
         )}
       </div>

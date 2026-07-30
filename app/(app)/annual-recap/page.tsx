@@ -61,18 +61,18 @@ export default function AnnualRecapPage() {
         {
             accessorKey: 'monthName',
             size: 120,
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Month" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Bulan" />,
             cell: ({ row }) => <span className="font-semibold">{row.getValue('monthName')}</span>,
         },
         {
             accessorKey: 'openingBalance',
             size: 150,
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Opening Balance" align="right" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Saldo Awal" align="right" />,
             cell: ({ row }) => (
                 <div className="text-right">
                     <span className="block">{formatRupiah(row.getValue('openingBalance'))}</span>
                     {row.original.isAutoCarry && (
-                        <span className="text-[10px] text-muted-foreground font-medium">auto-carry</span>
+                        <span className="text-[10px] text-muted-foreground font-medium">otomatis</span>
                     )}
                 </div>
             ),
@@ -80,7 +80,7 @@ export default function AnnualRecapPage() {
         {
             accessorKey: 'income',
             size: 150,
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Income" align="right" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Pemasukan" align="right" />,
             cell: ({ row }) => (
                 <div className="text-right font-semibold text-emerald-600">
                     {formatRupiah(row.getValue('income'))}
@@ -90,9 +90,9 @@ export default function AnnualRecapPage() {
         {
             accessorKey: 'expense',
             size: 150,
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Expense" align="right" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Pengeluaran" align="right" />,
             cell: ({ row }) => (
-                <div className="text-right font-semibold text-slate-600">
+                <div className="text-right font-semibold text-destructive">
                     {formatRupiah(row.getValue('expense'))}
                 </div>
             ),
@@ -100,7 +100,7 @@ export default function AnnualRecapPage() {
         {
             accessorKey: 'profitLoss',
             size: 150,
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Profit / Loss" align="right" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Laba / Rugi" align="right" />,
             cell: ({ row }) => (
                 <div
                     className={`text-right font-semibold ${
@@ -114,7 +114,7 @@ export default function AnnualRecapPage() {
         {
             accessorKey: 'closingBalance',
             size: 150,
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Closing Balance" align="right" />,
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Saldo Akhir" align="right" />,
             cell: ({ row }) => (
                 <div className="text-right font-semibold">
                     {formatRupiah(row.getValue('closingBalance'))}
@@ -135,7 +135,7 @@ export default function AnnualRecapPage() {
     const totals: AnnualRecapTotals | undefined = data?.totals;
 
     if (error) {
-        toast({ title: 'Error', description: 'Failed to load annual recap', variant: 'destructive' });
+        toast({ title: 'Gagal', description: 'Gagal memuat rekapitulasi tahunan', variant: 'destructive' });
     }
 
     return (
@@ -144,9 +144,9 @@ export default function AnnualRecapPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
-                        Annual Recap
+                        Rekapitulasi Tahunan
                     </h1>
-                    <p className="text-sm text-muted-foreground mt-1">Yearly cash book summary and performance</p>
+                    <p className="text-sm text-muted-foreground mt-1">Ringkasan dan performa buku kas tahunan</p>
                 </div>
 
                 {/* Summary Cards */}
@@ -157,7 +157,7 @@ export default function AnnualRecapPage() {
                                 <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                                     <Wallet className="w-5 h-5 text-primary-foreground" />
                                 </div>
-                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Year Start Balance</p>
+                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Saldo Awal Tahun</p>
                             </div>
                             <p className="text-2xl font-semibold text-foreground">{formatRupiah(totals?.openingBalance || 0)}</p>
                         </CardContent>
@@ -169,21 +169,21 @@ export default function AnnualRecapPage() {
                                 <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
                                     <TrendingUp className="w-5 h-5 text-emerald-600" />
                                 </div>
-                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Income</p>
+                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Pemasukan</p>
                             </div>
-                            <p className="text-2xl font-semibold text-foreground">{formatRupiah(totals?.income || 0)}</p>
+                            <p className="text-2xl font-semibold text-emerald-600">{formatRupiah(totals?.income || 0)}</p>
                         </CardContent>
                     </Card>
 
                     <Card className="bg-white border-border shadow-sm rounded-2xl">
                         <CardContent className="p-5">
                             <div className="flex items-center gap-3 mb-3">
-                                <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100">
-                                    <TrendingDown className="w-5 h-5 text-slate-600" />
+                                <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center border border-destructive/20">
+                                    <TrendingDown className="w-5 h-5 text-destructive" />
                                 </div>
-                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Expense</p>
+                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Pengeluaran</p>
                             </div>
-                            <p className="text-2xl font-semibold text-foreground">{formatRupiah(totals?.expense || 0)}</p>
+                            <p className="text-2xl font-semibold text-destructive">{formatRupiah(totals?.expense || 0)}</p>
                         </CardContent>
                     </Card>
 
@@ -193,7 +193,7 @@ export default function AnnualRecapPage() {
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${(totals?.profitLoss || 0) >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-destructive/10 border-destructive/20'}`}>
                                     <Calendar className={`w-5 h-5 ${(totals?.profitLoss || 0) >= 0 ? 'text-emerald-600' : 'text-destructive'}`} />
                                 </div>
-                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Profit / Loss</p>
+                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Laba / Rugi</p>
                             </div>
                             <p className={`text-2xl font-semibold ${(totals?.profitLoss || 0) >= 0 ? 'text-foreground' : 'text-destructive'}`}>
                                 {formatRupiah(totals?.profitLoss || 0)}
@@ -206,11 +206,11 @@ export default function AnnualRecapPage() {
                 <Tabs defaultValue="table" className="w-full">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
                         <TabsList className="grid w-full sm:max-w-md grid-cols-2 h-11 bg-muted rounded-full p-1">
-                            <TabsTrigger value="table" className="rounded-full font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all duration-base">
-                                <TableIcon className="w-4 h-4 mr-2" /> Recap Table
+                            <TabsTrigger value="table" className="rounded-full font-medium data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-all duration-base">
+                                <TableIcon className="w-4 h-4 mr-2" /> Tabel Rekap
                             </TabsTrigger>
-                            <TabsTrigger value="chart" className="rounded-full font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all duration-base">
-                                <BarChart3 className="w-4 h-4 mr-2" /> Performance Chart
+                            <TabsTrigger value="chart" className="rounded-full font-medium data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-all duration-base">
+                                <BarChart3 className="w-4 h-4 mr-2" /> Grafik Performa
                             </TabsTrigger>
                         </TabsList>
 
@@ -220,7 +220,7 @@ export default function AnnualRecapPage() {
                                     <ChevronLeft className="h-5 w-5" />
                                 </Button>
                                 <div className="text-center min-w-[80px]">
-                                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest block">Year</span>
+                                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest block">Tahun</span>
                                     <span className="text-lg font-semibold text-foreground leading-tight">{year}</span>
                                 </div>
                                 <Button variant="ghost" size="icon" onClick={() => setYear(y => y + 1)} className="h-8 w-8 rounded-full hover:bg-muted">
@@ -236,7 +236,7 @@ export default function AnnualRecapPage() {
                                 <DataTable
                                     table={table}
                                     loading={isLoading}
-                                    emptyMessage="No data available."
+                                    emptyMessage="Tidak ada data."
                                     footer={
                                         totals ? (
                                             <TableRow>
@@ -247,7 +247,7 @@ export default function AnnualRecapPage() {
                                                 <TableCell className="text-right text-emerald-600 font-semibold whitespace-nowrap">
                                                     {formatRupiah(totals.income)}
                                                 </TableCell>
-                                                <TableCell className="text-right text-slate-600 font-semibold whitespace-nowrap">
+                                                <TableCell className="text-right text-destructive font-semibold whitespace-nowrap">
                                                     {formatRupiah(totals.expense)}
                                                 </TableCell>
                                                 <TableCell
@@ -270,23 +270,23 @@ export default function AnnualRecapPage() {
 
                     <TabsContent value="chart">
                         <Card className="border-border shadow-sm rounded-2xl p-4 md:p-8">
-                            <h3 className="text-lg font-semibold mb-6">Monthly Performance</h3>
+                            <h3 className="text-lg font-semibold mb-6">Performa Bulanan</h3>
                             <div className="h-[400px] w-full">
                                 {chartData.length > 0 ? (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                                            <XAxis dataKey="name" tick={{ fontSize: 12, fontWeight: 500 }} axisLine={{ stroke: '#e2e8f0' }} tickLine={{ stroke: '#e2e8f0' }} />
-                                            <YAxis tickFormatter={(v) => `Rp${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} axisLine={{ stroke: '#e2e8f0' }} tickLine={{ stroke: '#e2e8f0' }} />
-                                            <Tooltip formatter={(value: number) => formatRupiah(value)} contentStyle={{ borderRadius: '16px', border: '1px solid #e2e8f0', fontWeight: 500, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }} />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                                            <XAxis dataKey="name" tick={{ fontSize: 12, fontWeight: 500 }} axisLine={{ stroke: 'hsl(var(--border))' }} tickLine={{ stroke: 'hsl(var(--border))' }} />
+                                            <YAxis tickFormatter={(v) => `Rp${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} axisLine={{ stroke: 'hsl(var(--border))' }} tickLine={{ stroke: 'hsl(var(--border))' }} />
+                                            <Tooltip formatter={(value: number) => formatRupiah(value)} contentStyle={{ borderRadius: '16px', border: '1px solid hsl(var(--border))', fontWeight: 500, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }} />
                                             <Legend wrapperStyle={{ fontWeight: 500 }} />
-                                            <Bar dataKey="income" name="Income" fill="#2563eb" radius={[6, 6, 0, 0]} />
-                                            <Bar dataKey="expense" name="Expense" fill="#64748b" radius={[6, 6, 0, 0]} />
-                                            <Line type="monotone" dataKey="profitLoss" name="Profit / Loss" stroke="#2563eb" strokeWidth={2.5} dot={{ r: 3, fill: '#2563eb', stroke: '#fff', strokeWidth: 2 }} />
+                                            <Bar dataKey="income" name="Pemasukan" fill="hsl(var(--chart-1))" radius={[6, 6, 0, 0]} />
+                                            <Bar dataKey="expense" name="Pengeluaran" fill="hsl(var(--chart-2))" radius={[6, 6, 0, 0]} />
+                                            <Line type="monotone" dataKey="profitLoss" name="Laba / Rugi" stroke="hsl(var(--chart-3))" strokeWidth={2.5} dot={{ r: 3, fill: 'hsl(var(--chart-3))', stroke: '#fff', strokeWidth: 2 }} />
                                         </ComposedChart>
                                     </ResponsiveContainer>
                                 ) : (
-                                    <div className="h-full flex items-center justify-center text-muted-foreground font-medium">No data to display</div>
+                                    <div className="h-full flex items-center justify-center text-muted-foreground font-medium">Tidak ada data untuk ditampilkan</div>
                                 )}
                             </div>
                         </Card>

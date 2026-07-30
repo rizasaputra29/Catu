@@ -5,7 +5,7 @@ import type { Transaction } from '@/lib/types';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const userId = getUserIdFromRequest(request);
-  if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
   try {
     const { id } = await params;
@@ -15,7 +15,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     });
 
     if (!transaction) {
-      return NextResponse.json({ message: 'Transaction not found' }, { status: 404 });
+      return NextResponse.json({ message: 'Transaksi tidak ditemukan' }, { status: 404 });
     }
 
     const response: Transaction = {
@@ -45,6 +45,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json(response);
   } catch (error) {
     console.error('Error fetching transaction:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
   }
 }

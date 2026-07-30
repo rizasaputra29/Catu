@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'CATU',
     short_name: 'CATU',
-    description: 'Track income, expenses, and cash flow for your UMKM business with CATU',
+    description: 'Catat pemasukan, pengeluaran, dan arus kas untuk bisnis UMKM Anda dengan CATU',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',

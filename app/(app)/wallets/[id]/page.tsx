@@ -33,7 +33,7 @@ export default function WalletDetailPage() {
   const walletTransactions = transactionsResponse?.data ?? [];
 
   const [form, setForm] = useState<Omit<Wallet, 'id' | 'userId' | 'createdAt' | 'updatedAt'>>({
-    name: '', type: 'cash', balance: 0, color: '#0000ee',
+    name: '', type: 'cash', balance: 0, color: '#3B6CB8',
   });
 
   useEffect(() => {
@@ -55,19 +55,19 @@ export default function WalletDetailPage() {
   const handleSave = async () => {
     try {
       await updateWallet.mutateAsync({ id, ...form });
-      toast({ title: "Updated", description: "Wallet details saved." });
+      toast({ title: "Berhasil", description: "Detail dompet disimpan." });
     } catch (e) {
-      toast({ title: "Error", description: "Failed to update.", variant: "destructive" });
+      toast({ title: "Gagal", description: "Gagal memperbarui.", variant: "destructive" });
     }
   };
 
   const handleDelete = async () => {
     try {
       await deleteWallet.mutateAsync(id);
-      toast({ title: "Deleted", description: "Wallet removed." });
+      toast({ title: "Berhasil", description: "Dompet dihapus." });
       router.push('/dashboard');
     } catch (e) {
-      toast({ title: "Error", description: "Failed to delete.", variant: "destructive" });
+      toast({ title: "Gagal", description: "Gagal menghapus.", variant: "destructive" });
     }
   };
 
@@ -76,47 +76,47 @@ export default function WalletDetailPage() {
       <div className="container mx-auto px-4 sm:px-6 py-6 max-w-2xl">
         <div className="mb-6">
           <Button variant="ghost" onClick={() => router.push('/dashboard')} className="pl-0 hover:bg-transparent text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-5 h-5 mr-2" /> Back to Dashboard
+            <ArrowLeft className="w-5 h-5 mr-2" /> Kembali ke Dasbor
           </Button>
         </div>
 
         {/* Edit Card */}
         <Card className="border border-border shadow-sm rounded-2xl overflow-hidden bg-card mb-8">
           <CardHeader className="px-6 pt-6 pb-4 border-b border-border/60">
-            <CardTitle className="text-xl font-semibold tracking-tight">Wallet Details</CardTitle>
+            <CardTitle className="text-xl font-semibold tracking-tight">Detail Dompet</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="font-medium">Name</Label>
+                  <Label className="font-medium">Nama</Label>
                   <Input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="h-11" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="font-medium">Type</Label>
+                  <Label className="font-medium">Jenis</Label>
                   <Select value={form.type} onValueChange={(v) => setForm({...form, type: v})}>
                     <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="cash">Tunai</SelectItem>
                       <SelectItem value="bank">Bank</SelectItem>
-                      <SelectItem value="e-wallet">E-Wallet</SelectItem>
+                      <SelectItem value="e-wallet">Dompet Digital</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="font-medium">Current Balance</Label>
+                <Label className="font-medium">Saldo Saat Ini</Label>
                 <Input
                   value={formatRupiah(form.balance).replace('Rp', '').trim()}
                   onChange={(e) => setForm({...form, balance: parseFloat(cleanRupiah(e.target.value)) || 0})}
                   className="h-14 text-xl font-semibold"
                 />
-                <p className="text-xs text-muted-foreground">Adjusting this creates a manual correction.</p>
+                <p className="text-xs text-muted-foreground">Menyesuaikan ini akan membuat koreksi manual.</p>
               </div>
               <div className="space-y-2">
-                <Label className="font-medium">Color Theme</Label>
+                <Label className="font-medium">Warna Tema</Label>
                 <div className="flex gap-2">
-                  {['#0000ee', '#3b82f6', '#6366f1', '#94a3b8', '#f1f5f9'].map(c => (
+                  {['#3B6CB8', '#2A5A9E', '#D4EC4A', '#94a3b8', '#f1f5f9'].map(c => (
                     <div
                       key={c}
                       onClick={() => setForm({...form, color: c})}
@@ -133,7 +133,7 @@ export default function WalletDetailPage() {
                   disabled={updateWallet.isPending}
                   className="flex-1 rounded-full bg-primary text-white font-semibold h-12 hover:bg-primary/90"
                 >
-                  <Save className="w-4 h-4 mr-2" /> {updateWallet.isPending ? 'Saving...' : 'Save Changes'}
+                  <Save className="w-4 h-4 mr-2" /> {updateWallet.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -143,17 +143,17 @@ export default function WalletDetailPage() {
                   </AlertDialogTrigger>
                   <AlertDialogContent className="rounded-2xl border border-border shadow-lg">
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Wallet?</AlertDialogTitle>
-                      <AlertDialogDescription>This will delete the wallet and ALL its transactions. This cannot be undone.</AlertDialogDescription>
+                      <AlertDialogTitle>Hapus Dompet?</AlertDialogTitle>
+                      <AlertDialogDescription>Ini akan menghapus dompet dan SEMUA transaksinya. Tindakan ini tidak dapat dibatalkan.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="rounded-full border-border">Cancel</AlertDialogCancel>
+                      <AlertDialogCancel className="rounded-full border-border">Batal</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={handleDelete}
                         disabled={deleteWallet.isPending}
                         className="rounded-full bg-destructive text-white hover:bg-destructive/90"
                       >
-                        {deleteWallet.isPending ? 'Deleting...' : 'Delete'}
+                        {deleteWallet.isPending ? 'Menghapus...' : 'Hapus'}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -164,15 +164,15 @@ export default function WalletDetailPage() {
         </Card>
 
         {/* History */}
-        <h3 className="text-lg font-semibold tracking-tight mb-4">Transaction History</h3>
+        <h3 className="text-lg font-semibold tracking-tight mb-4">Riwayat Transaksi</h3>
         <div className="space-y-3">
           {walletTransactions.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground bg-muted/30 rounded-2xl border border-dashed border-border">No transactions found for this wallet.</div>
+            <div className="p-8 text-center text-muted-foreground bg-muted/30 rounded-2xl border border-dashed border-border">Tidak ada transaksi untuk dompet ini.</div>
           ) : (
             walletTransactions.map((t: Transaction) => (
               <div key={t.id} className="bg-card p-4 rounded-2xl border border-border shadow-sm flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-foreground'}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-destructive/10 text-destructive'}`}>
                     {t.type === 'income' ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
                   </div>
                   <div>
@@ -180,7 +180,7 @@ export default function WalletDetailPage() {
                     <p className="text-xs text-muted-foreground">{new Date(t.date).toLocaleDateString()}</p>
                   </div>
                 </div>
-                <span className={`font-semibold ${t.type === 'income' ? 'text-emerald-600' : 'text-foreground'}`}>
+                <span className={`font-semibold ${t.type === 'income' ? 'text-emerald-600' : 'text-destructive'}`}>
                   {t.type === 'income' ? '+' : '-'} {formatRupiah(t.amount)}
                 </span>
               </div>

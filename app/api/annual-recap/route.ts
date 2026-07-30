@@ -26,20 +26,20 @@ export interface AnnualRecapResponse {
 }
 
 const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ];
 
 // GET: Aggregate annual recap
 export async function GET(request: Request) {
     const userId = getUserIdFromRequest(request);
-    if (!userId) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    if (!userId) return NextResponse.json({ message: 'Tidak diizinkan' }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const year = parseInt(searchParams.get('year') || '');
 
     if (isNaN(year)) {
-        return NextResponse.json({ message: 'Invalid year' }, { status: 400 });
+        return NextResponse.json({ message: 'Tahun tidak valid' }, { status: 400 });
     }
 
     try {
@@ -89,6 +89,6 @@ export async function GET(request: Request) {
 
         return NextResponse.json(response);
     } catch (error) {
-        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ message: 'Kesalahan server' }, { status: 500 });
     }
 }
