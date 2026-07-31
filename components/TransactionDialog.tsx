@@ -77,14 +77,14 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-border rounded-2xl sm:max-w-md max-h-[90dvh] flex flex-col overflow-hidden bg-white p-0 gap-0 shadow-lg">
-         <DialogHeader className="shrink-0 p-6 pb-4 border-b border-border">
+      <DialogContent className="border border-border rounded-2xl max-w-[calc(100%-2rem)] sm:max-w-md max-h-[90dvh] flex flex-col overflow-hidden bg-white p-0 gap-0 shadow-lg">
+         <DialogHeader className="shrink-0 pt-6 px-4 sm:px-6 pb-4 border-b border-border">
           <DialogTitle className="text-2xl font-bold">
             {initialData ? 'Ubah Transaksi' : 'Transaksi Baru'}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto min-h-0 px-6 py-6 space-y-6">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-4 sm:px-6 py-6 space-y-6">
           <Tabs value={type} onValueChange={(v) => setType(v as any)} className="w-full">
             <TabsList className="grid w-full grid-cols-2 h-12 bg-muted rounded-xl p-1">
                <TabsTrigger
@@ -175,7 +175,7 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
            </div>
         </div>
 
-        <DialogFooter className="shrink-0 px-6 py-4 border-t border-border bg-white">
+        <DialogFooter className="shrink-0 px-4 sm:px-6 py-4 border-t border-border bg-white">
            <Button
              onClick={handleSave}
              disabled={!amount || !walletId || !category || isSubmitting}
