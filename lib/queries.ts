@@ -98,6 +98,26 @@ export async function fetchAnnualRecap(year: number): Promise<AnnualRecapData> {
   return handleResponse<AnnualRecapData>(response);
 }
 
+export async function downloadAnnualRecapExport(year: number, format: 'csv' | 'xlsx' | 'pdf') {
+  const response = await fetch(`/api/annual-recap?year=${year}&format=${format}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`HTTP ${response.status}: ${text || response.statusText}`);
+  }
+  const blob = await response.blob();
+  const extension = format === 'pdf' ? 'pdf' : format;
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `CATU_Recap_${year}.${extension}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+
 export async function fetchOpeningBalance(year: number, month: number): Promise<OpeningBalance> {
   const response = await fetch(`/api/opening-balance?year=${year}&month=${month}`, { headers: getAuthHeaders() });
   return handleResponse<OpeningBalance>(response);

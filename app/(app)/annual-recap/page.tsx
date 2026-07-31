@@ -13,7 +13,14 @@ import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 import { TableCell, TableRow } from '@/components/ui/table';
 import { formatRupiah } from '@/lib/utils';
 import { useAnnualRecap } from '@/hooks/queries/useAnnualRecap';
+import { downloadAnnualRecapExport } from '@/lib/queries';
 import type { AnnualRecapRow, AnnualRecapTotals } from '@/lib/types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import {
     ChevronLeft,
@@ -23,7 +30,11 @@ import {
     Wallet,
     BarChart3,
     Table as TableIcon,
-    Calendar
+    Calendar,
+    Download,
+    FileText,
+    FileSpreadsheet,
+    File,
 } from 'lucide-react';
 import {
     ComposedChart,
@@ -43,8 +54,29 @@ export default function AnnualRecapPage() {
     const now = new Date();
     const [year, setYear] = useState(now.getFullYear());
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [isExporting, setIsExporting] = useState(false);
 
     const { data, isLoading, error } = useAnnualRecap(year, Boolean(user));
+
+    const handleExport = async (format: 'csv' | 'xlsx' | 'pdf') => {
+        if (isExporting) return;
+        setIsExporting(true);
+        try {
+            await downloadAnnualRecapExport(year, format);
+            toast({
+                title: 'Ekspor berhasil',
+                description: `File ${format.toUpperCase()} sedang diunduh.`,
+            });
+        } catch (err) {
+            toast({
+                title: 'Ekspor gagal',
+                description: err instanceof Error ? err.message : 'Terjadi kesalahan',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
     const chartData = useMemo(() => {
         return data?.months.map((m: AnnualRecapRow) => ({
@@ -227,6 +259,35 @@ export default function AnnualRecapPage() {
                                     <ChevronRight className="h-5 w-5" />
                                 </Button>
                             </div>
+                        </div>
+
+                        <div className="w-full flex justify-center sm:w-auto">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="rounded-full border-border gap-2"
+                                        disabled={isLoading || !data || isExporting}
+                                    >
+                                        <Download className="w-4 h-4" />
+                                        Ekspor
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => handleExport('csv')}>
+                                        <FileText className="w-4 h-4 mr-2 text-[var(--brand-blue)]" />
+                                        Export CSV
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleExport('xlsx')}>
+                                        <FileSpreadsheet className="w-4 h-4 mr-2 text-[var(--brand-blue)]" />
+                                        Export Excel
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                                        <File className="w-4 h-4 mr-2 text-[var(--brand-blue)]" />
+                                        Export PDF
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
 
