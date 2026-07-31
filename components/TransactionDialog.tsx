@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -77,14 +77,14 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-border rounded-2xl sm:max-w-md p-0 overflow-hidden bg-white gap-0 shadow-lg">
-         <DialogHeader className="p-6 pb-4 border-b border-border">
+      <DialogContent className="border border-border rounded-2xl sm:max-w-md max-h-[90dvh] flex flex-col overflow-hidden bg-white p-0 gap-0 shadow-lg">
+         <DialogHeader className="shrink-0 p-6 pb-4 border-b border-border">
           <DialogTitle className="text-2xl font-bold">
             {initialData ? 'Ubah Transaksi' : 'Transaksi Baru'}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto min-h-0 px-6 py-6 space-y-6">
           <Tabs value={type} onValueChange={(v) => setType(v as any)} className="w-full">
             <TabsList className="grid w-full grid-cols-2 h-12 bg-muted rounded-xl p-1">
                <TabsTrigger
@@ -129,7 +129,7 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
                               <span className="truncate">{wallets.find(w => w.id === walletId)?.name || "Pilih Dompet"}</span>
                          </div>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent position="popper">
                           {wallets.map(w => (
                             <SelectItem key={w.id} value={w.id} className="font-medium">
                                 {w.name} <span className="text-xs text-muted-foreground ml-1">({formatRupiah(w.balance)})</span>
@@ -156,7 +156,7 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
                           <SelectValue placeholder="Pilih Kategori" />
                       </div>
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper">
                       {(type === 'expense' ? expenseCategories : incomeCategories).map(c => (
                           <SelectItem key={c} value={c} className="font-medium">{c}</SelectItem>
                       ))}
@@ -173,7 +173,9 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
                   className="rounded-xl resize-none font-medium min-h-[80px]"
                />
            </div>
+        </div>
 
+        <DialogFooter className="shrink-0 px-6 py-4 border-t border-border bg-white">
            <Button
              onClick={handleSave}
              disabled={!amount || !walletId || !category || isSubmitting}
@@ -181,7 +183,7 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
            >
              {isSubmitting ? 'Menyimpan...' : (initialData ? 'Simpan Perubahan' : 'Simpan Transaksi')}
            </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
