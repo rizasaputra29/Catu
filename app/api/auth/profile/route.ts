@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ClientUser, hashPassword, comparePassword } from '@/lib/auth';
 import { cookies } from 'next/headers'; // Import penting!
+import { deleteAvatar, getPublicIdFromUrl } from '@/lib/cloudinary-server';
 
 // Helper untuk mendapatkan userId dari Cookie (khusus route ini)
 async function getAuthUser() {
@@ -57,11 +58,35 @@ export async function PUT(request: Request) {
         return NextResponse.json({ message: 'Tidak ada data yang valid' }, { status: 400 });
     }
 
+    // Fetch current avatarUrl so we can delete the old Cloudinary asset after update.
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { avatarUrl: true },
+    });
+    const oldAvatarUrl = currentUser?.avatarUrl || null;
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: updateData,
       select: { id: true, email: true, fullName: true, businessName: true, avatarUrl: true }, 
     });
+
+    // Delete old avatar from Cloudinary if it changed to a new URL.
+    if (
+      oldAvatarUrl &&
+      avatarUrl !== undefined &&
+      avatarUrl &&
+      avatarUrl !== oldAvatarUrl
+    ) {
+      try {
+        const publicId = getPublicIdFromUrl(oldAvatarUrl);
+        if (publicId) {
+          await deleteAvatar(publicId);
+        }
+      } catch (error) {
+        console.error('Failed to delete old avatar:', error);
+      }
+    }
 
     return NextResponse.json(updatedUser as ClientUser);
   } catch (error) {

@@ -10,9 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useBackup, useImport } from '@/hooks/mutations/useBackupImportMutations';
-import { User, Mail, Save, Download, Upload, Image as ImageIcon, AlertTriangle, ShieldCheck, Edit2, X, Store } from 'lucide-react';
-import { CldUploadButton } from 'next-cloudinary';
-import type { CloudinaryUploadWidgetResults } from 'next-cloudinary';
+import { User, Mail, Save, Download, Upload, Image as ImageIcon, AlertTriangle, ShieldCheck, Edit2, X, Store, Loader2 } from 'lucide-react';
+import { getCloudinaryAvatarUrl } from '@/lib/cloudinary';
 
 export default function ProfilePage() {
   const { user, updateProfile } = useAuth();
@@ -24,7 +23,9 @@ export default function ProfilePage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isImportLoading, setIsImportLoading] = useState(false);
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -42,15 +43,89 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  const handleUploadSuccess = (result: CloudinaryUploadWidgetResults) => {
-    const info = result.info as { secure_url: string };
-    if (info && info.secure_url) {
-      setFormData({ ...formData, avatarUrl: info.secure_url });
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
       toast({
-        title: 'Gambar Diunggah',
-        description: 'Klik "Simpan Perubahan" untuk menerapkan avatar baru Anda.',
+        title: 'Gagal',
+        description: 'Hanya file gambar yang diizinkan.',
+        variant: 'destructive',
       });
-      setIsEditing(true);
+      return;
+    }
+
+    const MAX_SIZE_MB = 2;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      toast({
+        title: 'Gagal',
+        description: `Ukuran gambar maksimal ${MAX_SIZE_MB}MB.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsAvatarUploading(true);
+    try {
+      const signatureRes = await fetch('/api/cloudinary-signature');
+      if (!signatureRes.ok) {
+        throw new Error('Gagal mendapatkan signature upload.');
+      }
+      const {
+        cloudName,
+        apiKey,
+        uploadPreset,
+        folder,
+        timestamp,
+        signature,
+      } = await signatureRes.json();
+
+      const formDataCloud = new FormData();
+      formDataCloud.append('file', file);
+      formDataCloud.append('upload_preset', uploadPreset);
+      formDataCloud.append('folder', folder);
+      formDataCloud.append('api_key', apiKey);
+      formDataCloud.append('timestamp', String(timestamp));
+      formDataCloud.append('signature', signature);
+
+      const uploadRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        {
+          method: 'POST',
+          body: formDataCloud,
+        }
+      );
+
+      if (!uploadRes.ok) {
+        const errorData = await uploadRes.json().catch(() => ({}));
+        throw new Error(
+          errorData.error?.message || 'Upload ke Cloudinary gagal.'
+        );
+      }
+
+      const uploadResult = await uploadRes.json();
+      const secureUrl: string = uploadResult.secure_url;
+
+      if (secureUrl) {
+        setFormData((prev) => ({ ...prev, avatarUrl: secureUrl }));
+        toast({
+          title: 'Gambar Diunggah',
+          description: 'Klik "Simpan Perubahan" untuk menerapkan avatar baru Anda.',
+        });
+        setIsEditing(true);
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Upload Gagal',
+        description: err.message || 'Terjadi kesalahan saat mengunggah avatar.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAvatarUploading(false);
+      if (avatarInputRef.current) {
+        avatarInputRef.current.value = '';
+      }
     }
   };
 
@@ -164,7 +239,7 @@ export default function ProfilePage() {
                     <CardContent className="pt-10 pb-8 px-6">
                         <div className="relative inline-block">
                              <Avatar className="w-32 h-32 mb-4 border-4 border-background shadow-sm">
-                                <AvatarImage src={formData.avatarUrl || undefined} alt={formData.fullName} className="object-cover" />
+                                <AvatarImage src={getCloudinaryAvatarUrl(formData.avatarUrl) || undefined} alt={formData.fullName} className="object-cover" />
                                 <AvatarFallback className="bg-primary/10 text-primary text-3xl font-semibold">
                                     {userInitials}
                                 </AvatarFallback>
@@ -178,21 +253,28 @@ export default function ProfilePage() {
                         <h2 className="text-xl font-semibold mt-2">{displayName}</h2>
                         <p className="text-muted-foreground text-sm mb-6">{user.email}</p>
 
-                        <CldUploadButton
-                            options={{
-                            sources: ['local', 'url', 'camera'],
-                            multiple: false,
-                            maxFiles: 1,
-                            cropping: true,
-                            croppingAspectRatio: 1,
-                            }}
-                            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-                            onSuccess={handleUploadSuccess}
-                            className="w-full h-10 rounded-full border border-border bg-white hover:bg-muted text-foreground font-medium transition-all duration-base ease-in-out inline-flex items-center justify-center"
+                        <input
+                            ref={avatarInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleAvatarChange}
+                            disabled={isAvatarUploading}
+                        />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            disabled={isAvatarUploading}
+                            onClick={() => avatarInputRef.current?.click()}
+                            className="w-full h-10 rounded-full border-border bg-white hover:bg-muted text-foreground font-medium transition-all duration-base ease-in-out"
                         >
-                            <ImageIcon className="w-4 h-4 mr-2" />
-                            Ubah Avatar
-                        </CldUploadButton>
+                            {isAvatarUploading ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : (
+                                <ImageIcon className="w-4 h-4 mr-2" />
+                            )}
+                            {isAvatarUploading ? 'Mengunggah...' : 'Ubah Avatar'}
+                        </Button>
                     </CardContent>
                 </Card>
 
