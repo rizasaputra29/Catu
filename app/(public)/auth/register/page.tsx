@@ -130,7 +130,7 @@ export default function RegisterPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="securityAnswer">Pertanyaan Keamanan: Nama Ibu Kandung</Label>
+                <Label htmlFor="securityAnswer">Pertanyaan Keamanan: Nama Anak / Orang Tua</Label>
                 <Input
                   id="securityAnswer"
                   type="text"

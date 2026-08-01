@@ -138,13 +138,18 @@ export function TransactionDialog({ open, onOpenChange, onSave, wallets, initial
                       </SelectContent>
                   </Select>
                </div>
-               <div className="space-y-2">
-                   <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tanggal</Label>
-                  <div className="relative">
-                      <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-12 rounded-xl font-bold pl-10" />
-                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  </div>
-               </div>
+                <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tanggal</Label>
+                    <div className="relative flex h-12 items-center rounded-xl border border-input bg-background px-3 overflow-hidden">
+                        <Calendar className="w-4 h-4 text-muted-foreground shrink-0 mr-2" />
+                        <Input
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            className="h-full w-full min-w-0 border-0 bg-transparent p-0 font-bold shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 truncate [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                        />
+                    </div>
+                </div>
            </div>
 
            <div className="space-y-2">
