@@ -1,21 +1,16 @@
 /** @type {import('next').NextConfig} */
-const runtimeCaching = require('next-pwa/cache');
+const withSerwistInit = require("@serwist/next").default;
 
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: false, 
-  importScripts: ['/custom-sw.js'],
-  runtimeCaching: [
-    ...runtimeCaching,
-  ],
+const withSerwist = withSerwistInit({
+  swSrc: "app/sw.ts",
+  swDest: "public/sw.js",
+  register: false,
 });
 
 const nextConfig = {
   reactStrictMode: false,
-  images: { 
-    unoptimized: false, 
+  images: {
+    unoptimized: false,
     remotePatterns: [
       { protocol: 'https', hostname: 'cdn.worldvectorlogo.com' },
       { protocol: 'https', hostname: 'upload.wikimedia.org' },
@@ -25,4 +20,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withPWA(nextConfig);
+module.exports = withSerwist(nextConfig);
