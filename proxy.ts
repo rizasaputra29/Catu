@@ -67,7 +67,7 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Matcher ini memastikan proxy berjalan di semua path kecuali static files
-    '/((?!_next/static|_next/image|favicon.ico|sw.js|workbox.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     '/api/:path*',
   ],
 };

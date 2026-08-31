@@ -1,12 +1,4 @@
 /** @type {import('next').NextConfig} */
-const withSerwistInit = require("@serwist/next").default;
-
-const withSerwist = withSerwistInit({
-  swSrc: "app/sw.ts",
-  swDest: "public/sw.js",
-  register: false,
-});
-
 const nextConfig = {
   reactStrictMode: false,
   images: {
@@ -20,4 +12,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withSerwist(nextConfig);
+module.exports = nextConfig;

@@ -4,7 +4,7 @@ import { Onest } from 'next/font/google';
 import { AuthProvider } from '../contexts/AuthContext';
 import { Providers } from './providers';
 import { Toaster } from '../components/ui/toaster';
-import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
+import { ServiceWorkerCleanup } from '@/components/ServiceWorkerCleanup';
 
 const onest = Onest({
   subsets: ['latin'],
@@ -20,11 +20,10 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-// 3. Konfigurasi Metadata (Judul, Deskripsi, Ikon, Manifest)
+// 3. Konfigurasi Metadata (Judul, Deskripsi, Ikon)
 export const metadata: Metadata = {
   title: 'CATU | Catatan Aplikasi Keuangan',
     description: 'Catat pemasukan, pengeluaran, dan arus kas untuk bisnis UMKM Anda dengan CATU',
-  manifest: '/manifest.json',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   openGraph: {
     title: 'CATU',
@@ -61,7 +60,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className={`${onest.variable} font-sans antialiased`} suppressHydrationWarning>
-        <ServiceWorkerRegister />
+        <ServiceWorkerCleanup />
         <AuthProvider>
           <Providers>
             {children}
